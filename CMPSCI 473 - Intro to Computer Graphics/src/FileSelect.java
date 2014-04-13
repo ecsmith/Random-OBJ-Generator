@@ -23,6 +23,11 @@ class FileSelect
                     RandomAccessFile FILE = new RandomAccessFile(file.getAbsoluteFile(), "rw");
                     System.out.println("Size in Bytes: " + FILE.length() + ".\n");
                     FileChunker FC = new FileChunker(FILE);
+                    FILE.seek(0);
+                    byte[] bytes = new byte[(int)FILE.length()];
+                    FILE.readFully(bytes);
+                    System.out.println("Output: " + bytes.toString() + ".\n");
+
                     
                     FILE.close(); 
                    } catch (IOException e) {//If the file is not found
