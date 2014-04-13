@@ -22,6 +22,8 @@ class FileSelect
                 try{
                     RandomAccessFile FILE = new RandomAccessFile(file.getAbsoluteFile(), "rw");
                     System.out.println("Size in Bytes: " + FILE.length() + ".\n");
+                    FileChunker FC = new FileChunker(FILE);
+                    
                     FILE.close(); 
                    } catch (IOException e) {//If the file is not found
            			e.printStackTrace();  //Print trace the error
