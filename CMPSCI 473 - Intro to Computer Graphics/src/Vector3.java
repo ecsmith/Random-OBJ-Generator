@@ -1,7 +1,10 @@
+import javax.vecmath.Vector3f;
+
 /**
  * Kelas yang merepresentasikan vektor tiga dimensi
  */
-public class Vector3
+
+public class Vector3 extends Vector3f
 {
     public float X;
     public float Y;

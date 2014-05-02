@@ -1,4 +1,3 @@
-
 /**
  * Kelas yang mengatur pergerakan kamera
  * Perhitungan tidak menggunakan glRotate maupun glTranslate
@@ -121,6 +120,4 @@ public class Camera
     {
         return upVector;
     }
-
-
 }
