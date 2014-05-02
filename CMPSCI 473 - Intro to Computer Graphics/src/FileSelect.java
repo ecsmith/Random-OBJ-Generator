@@ -5,6 +5,9 @@ import javax.swing.SwingUtilities;
 
 class FileSelect 
 {
+   public static byte[] bytes;
+   public static RandomAccessFile rand_file;
+   
    public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
 
@@ -20,16 +23,15 @@ class FileSelect
                 System.out.println("Opening: " + file.getName() + ".\n");
                 System.out.println("Size in Bytes: " + file.getFreeSpace() + ".\n");
                 try{
-                    RandomAccessFile FILE = new RandomAccessFile(file.getAbsoluteFile(), "rw");
-                    System.out.println("Size in Bytes: " + FILE.length() + ".\n");
-                    FileChunker FC = new FileChunker(FILE);
-                    FILE.seek(0);
-                    byte[] bytes = new byte[(int)FILE.length()];
-                    FILE.readFully(bytes);
+                    rand_file = new RandomAccessFile(file.getAbsoluteFile(), "rw");
+                    System.out.println("Size in Bytes: " + rand_file.length() + ".\n");
+                    rand_file.seek(0);
+                    bytes = new byte[(int)rand_file.length()];
+                    rand_file.readFully(bytes);
                     System.out.println("Output: " + bytes.toString() + ".\n");
 
                     
-                    FILE.close(); 
+                    rand_file.close(); 
                    } catch (IOException e) {//If the file is not found
            			e.printStackTrace();  //Print trace the error
            		}

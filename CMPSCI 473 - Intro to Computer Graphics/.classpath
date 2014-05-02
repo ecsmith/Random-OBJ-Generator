@@ -13,5 +13,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="vecmath.jar"/>
+	<classpathentry kind="lib" path="timer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
