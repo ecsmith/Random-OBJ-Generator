@@ -6,37 +6,34 @@ import java.awt.image.PixelGrabber;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/**
- * Kelas untuk pembacaan file image
- */
+
 public class TextureReader
 {
-    // baca tekstur
+  
     public static Texture readTexture(String filename) throws IOException
     {
         return readTexture(filename, false);
     }
 
-    // baca tekstur
     public static Texture readTexture(String filename, boolean storeAlphaChannel) throws IOException
     {
         BufferedImage bufferedImage;
-        if (filename.endsWith(".bmp"))  // jike merupakan file bitmap
+        if (filename.endsWith(".bmp"))  
             bufferedImage = BitmapLoader.loadBitmap(filename);
-        else    // selain file bitmap
+        else    
             bufferedImage = readImage(filename);
         
 
         return readPixels(bufferedImage, storeAlphaChannel);
     }
 
-    // baca gambar
+    
     private static BufferedImage readImage(String resourceName) throws IOException
     {
         return ImageIO.read(ResourceGrabber.getResourceAsStream(resourceName));
     }
 
-    // baca piksel
+    
     private static Texture readPixels(BufferedImage img, boolean storeAlphaChannel)
     {
         int[] packedPixels = new int[img.getWidth() * img.getHeight()];
@@ -76,14 +73,12 @@ public class TextureReader
         return new Texture(unpackedPixels, img.getWidth(), img.getHeight());
     }
 
-    /**
-     * Kelas tekstur yang memiliki informasi width dan height serta data piksel
-     */
+    
     public static class Texture
     {
-        private ByteBuffer pixels;  // informasi piksel
-        private int width;          // lebar
-        private int height;         // tinggi
+        private ByteBuffer pixels;  
+        private int width;        
+        private int height;         
 
         public Texture(ByteBuffer pixels, int width, int height)
         {
