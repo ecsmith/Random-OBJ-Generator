@@ -1,8 +1,4 @@
-/**
- * Kelas yang mengatur pergerakan kamera
- * Perhitungan tidak menggunakan glRotate maupun glTranslate
- * tapi menggunakan perhitungan vektor
- */
+
 
 public class Camera
 {
@@ -11,18 +7,18 @@ public class Camera
     Vector3 origUpVector = new Vector3(0.0f, 1.0f, 0.0f);
     Vector3 origPosition = new Vector3(75.5f, 90.0f, 150.0f);
 
-    Vector3 viewDir;   // arah pandangan kamera
-    Vector3 rightVector;    // vektor kanan kamera
-    Vector3 upVector;       // vektor atas kamera
-    Vector3 position;   // posisi kamera
+    Vector3 viewDir;   
+    Vector3 rightVector;    
+    Vector3 upVector;       
+    Vector3 position;   
 
-    float rotatedX;  // jumlah rotasi sumbu x
-    float rotatedY;  // jumlah rotasi sumbu y
-    float rotatedZ;  // jumlah rotasi sumbu z
+    float rotatedX; 
+    float rotatedY; 
+    float rotatedZ;
 
-    float PiDiv180 = (float)Math.PI / 180.0f;   // digunakan untuk mengubah derajat ke radian
+    float PiDiv180 = (float)Math.PI / 180.0f;   
 
-    VectorUtils vectorUtils = new VectorUtils();    // untuk perhitungan vektor
+    VectorUtils vectorUtils = new VectorUtils();   
 
     public Camera()
     {
@@ -42,13 +38,13 @@ public class Camera
         rotatedZ = 0.0f;
     }
 
-    // perpindahan kamera berdasarkan arah
+
     public void move(Vector3 direction)
     {
         position = vectorUtils.Vector3Addition(position, direction);
     }
 
-    // rotasi sumbu x
+   
     public void rotateX(float angle)
     {
         rotatedX += angle;
@@ -60,7 +56,7 @@ public class Camera
         upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
     }
 
-    // rotasi sumbu y
+ 
     public void rotateY(float angle)
     {
         rotatedY += angle;
@@ -73,7 +69,7 @@ public class Camera
         rightVector = vectorUtils.Vector3CrossProduct(viewDir, upVector);
     }
 
-    // rotasi sumbu z
+  
     public void rotateZ(float angle)
     {
         rotatedZ += angle;
@@ -85,37 +81,37 @@ public class Camera
         upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
     }
 
-    // pergerakan maju atau mundur
+    
     public void moveForward(float distance)
     {
         position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(viewDir, -distance));
     }
 
-    // pergerakan ke kanan atau ke kiri
+   
     public void strafeRight(float distance)
     {
         position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(rightVector, distance));
     }
 
-    // pergerakan ke atas atau ke bawah
+    
     public void moveUpward(float distance)
     {
         position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(upVector, distance));
     }
 
-    // mendapatkan posisi kamera
+    
     public Vector3 getCameraPosition()
     {
         return position;
     }
 
-    // mendapatkan target kamera
+   
     public Vector3 getCameraTarget()
     {
         return vectorUtils.Vector3Addition(position, viewDir);
     }
 
-    // mendapatkan vektor atas kamera
+   
     public Vector3 getUpVector()
     {
         return upVector;
