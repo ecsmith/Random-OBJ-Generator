@@ -301,7 +301,7 @@ public class GLRenderer implements GLEventListener
         double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
         _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE1);
-        glu.gluSphere(quadric, 5000, 50, 5);
+        //glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE1);
         _gl.glPopMatrix();  
         _gl.glPushMatrix(); 
@@ -310,7 +310,7 @@ public class GLRenderer implements GLEventListener
         double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
         _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE2);       
-        glu.gluSphere(quadric, 5000, 50, 5);
+        //glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE2);
         _gl.glPopMatrix();  
 
@@ -414,7 +414,7 @@ public class GLRenderer implements GLEventListener
 
         // HEIGHTFIELD /////////////////////////////////////////////////////////
 
-        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getName()); }
+        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
         catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e); }
