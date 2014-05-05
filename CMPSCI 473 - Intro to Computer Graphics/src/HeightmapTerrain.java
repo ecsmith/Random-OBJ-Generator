@@ -342,6 +342,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 
 	static int curX;
 	static int curY;
+
 	private boolean ignoreRobotMove = false;
 	
 	public void mouseMoved(MouseEvent e) {

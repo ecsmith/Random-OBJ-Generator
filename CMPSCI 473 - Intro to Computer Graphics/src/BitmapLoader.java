@@ -5,10 +5,6 @@ import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Kelas untuk pembacaan file bitmap
- *
- */
 public class BitmapLoader
 {
     public static BufferedImage loadBitmap(String file) throws IOException
@@ -28,7 +24,6 @@ public class BitmapLoader
             input.read(bitmapFileHeader, 0, bitmapFileHeaderLength);
             input.read(bitmapInfoHeader, 0, bitmapInfoHeaderLength);
 
-            // informasi datagram file BMP
             int nSize = bytesToInt(bitmapFileHeader, 2);
             int nWidth = bytesToInt(bitmapInfoHeader, 4);
             int nHeight = bytesToInt(bitmapInfoHeader, 8);
@@ -70,7 +65,6 @@ public class BitmapLoader
         return image;
     }
 
-    // pembacaan bitmap 8 bit
     private static BufferedImage read8BitBitmap(int nColoursUsed, int nBitCount, int nSizeImage, int nWidth, int nHeight, InputStream input) throws IOException
     {
         int nNumColors = (nColoursUsed > 0) ? nColoursUsed : (1 & 0xff) << nBitCount;
@@ -118,7 +112,6 @@ public class BitmapLoader
         return bufferedImage;
     }
 
-    // pembacaan bitmap 24 bit
     private static BufferedImage read24BitBitmap(int nSizeImage, int nHeight, int nWidth, InputStream input) throws IOException
     {
         int npad = (nSizeImage / nHeight) - nWidth * 3;
@@ -149,7 +142,6 @@ public class BitmapLoader
         return bufferedImage;
     }
 
-    // byte ke integer
     private static int bytesToInt(byte[] bytes, int index)
     {
         return (bytes[index + 3] & 0xff) << 24 |
@@ -158,14 +150,12 @@ public class BitmapLoader
                 bytes[index + 0] & 0xff;
     }
 
-    // bute ke short
     private static short bytesToShort(byte[] bytes, int index)
     {
         return (short) (((bytes[index + 1] & 0xff) << 8) |
                 (bytes[index + 0] & 0xff));
     }
 
-    // pembacaan buffer
     private static void readBuffer(InputStream in, byte[] buffer) throws IOException
     {
         int bytesRead = 0;
