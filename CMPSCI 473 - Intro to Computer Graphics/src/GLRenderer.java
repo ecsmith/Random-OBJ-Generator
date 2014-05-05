@@ -439,19 +439,16 @@ public class GLRenderer implements GLEventListener
 
     }
 
-    // mendapatkan tipe render
     public RenderType getRenderType()
     {
         return renderType;
     }
 
-    // mengatur tipe render
     public void setRenderType(RenderType renderType)
     {
         this.renderType = renderType;
     }
 
-    // medapatkan skala terrain
     public float getScaleValue()
     {
         return scaleValue;
