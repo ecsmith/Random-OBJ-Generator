@@ -1,16 +1,3 @@
-
-/*
- * PERMODELAN TERRAIN DENGAN MENGGUNAKAN
- * TEKNIK HEIGHTMAP
- *
- * Decky Kurniawan		5106100131
- * I Made Krisna Widhiastra	5107100038
- * Reza Adhitya Saputra		5107100098
- * Izzudin Gumilar Aprilian	5107100125
- *
- */
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import javax.media.opengl.GL;
@@ -21,91 +8,81 @@ import javax.media.opengl.glu.GLUquadric;
 
 public class GLRenderer implements GLEventListener
 {
-    private RenderType renderType;                              // tipe render
-    private static final int MAP_SIZE = 1024;                   // ukuran dari heightmap
-    private static final int STEP_SIZE = 4;                     // panjang dan lebar tiap QUAD
-    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];   // array untuk menyimpan data heightmap
-    private float scaleValue = 0.10f;                           // nilai skala untuk model terrain
-    private float HEIGHT_RATIO = 1.0f;                          // rasio ketinggian terrain
-    private float skyMovCounter = 0.0f;                         // counter rotasi pergerakan sky
-    private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};        // light ambient, warna putih
-    private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};        // light diffuse, warna putih
-    private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f}; // posisi light
-    public int terrainFilter = 3;                               // tekstur terrain mana yang diaktifkan
-    public int textureFilter = 2;                               // tekstur mode mana yang diaktifkan
-    private int[] textures = new int[12];                       // penyimpanan untuk tiga tekstur
-    private int skyTexture;                                     // tekstur untuk skysphere
-    private boolean cullingMode = false;                        // menentukan bagian mana dari poligon yang kelihatan
-    private GLU glu = new GLU();                                // objek GLU
-    private GLUquadric quadric;                                 // objek bola, digunakan untuk skysphere
-    private GL _gl;                                             // objek GL
-    public String filename = null;                              // nama file heightmap
-    public Camera camera = new Camera();                        // objek kamera
+    private RenderType renderType;                            
+    private static final int MAP_SIZE = 1024;                 
+    private static final int STEP_SIZE = 4;                     
+    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];  
+    private float scaleValue = 0.10f;                          
+    private float HEIGHT_RATIO = 1.0f;                          
+    private float skyMovCounter = 0.0f;                       
+    private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};       
+    private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};        
+    private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f}; 
+    public int terrainFilter = 3;                               
+    public int textureFilter = 2;                               
+    private int[] textures = new int[12];                     
+    private int skyTexture;                                    
+    private boolean cullingMode = false;                       
+    private GLU glu = new GLU();                            
+    private GLUquadric quadric;                               
+    private GL _gl;                                            
+    public String filename = null;                           
+    public Camera camera = new Camera();                     
 
-    // konstruktor dengan parameter nama file
     public GLRenderer(String file)
     {
         filename = file;
         renderType = RenderType.TEXTURED;
     }
 
-    // konstruktor tanpa parameter
     public GLRenderer()
     {
         renderType = RenderType.TEXTURED;
     }
 
-    // inisiasi, dipanggil sekali di awal program
+  
     public void init(GLAutoDrawable drawable)
     {
-        // Use debug pipeline
-        // drawable.setGL(new DebugGL(drawable.getGL()));
 
         GL gl = drawable.getGL();
         this._gl = gl;
         System.err.println("INIT GL IS: " + gl.getClass().getName());
 
-        // Enable VSync
         gl.setSwapInterval(1);
 
-        // Setup the drawing area and shading mode
         gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        gl.glClearDepth(1.0f);                     // Depth Buffer Setup
-        gl.glEnable(GL.GL_DEPTH_TEST);             // Enables Depth Testing
-        gl.glDepthFunc(GL.GL_LEQUAL);              // The Type Of Depth Testing To Do
-        gl.glShadeModel(GL.GL_SMOOTH);              // try setting this to GL_FLAT and see what happens
-        //gl.glEnable(GL.GL_MULTISAMPLE);
+        gl.glClearDepth(1.0f);                     
+        gl.glEnable(GL.GL_DEPTH_TEST);             
+        gl.glDepthFunc(GL.GL_LEQUAL);           
+        gl.glShadeModel(GL.GL_SMOOTH);              
+        
 
-        // Really Nice Perspective Calculations
+     
        
         gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
         if(filename == null)
-            loadFile("Heightfield.bmp");    // load fil heightmap
+            loadFile("Heightfield.bmp");    
         else
             loadFile(filename);
 
-        setTexture();   // mengatur tekstur
+        setTexture();  
 
-        setLightning(gl);   // mengatur lightning
+        setLightning(gl);  
 
-        quadric = glu.gluNewQuadric();                  // inisiasi quadric
-        glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH); // mode SMOOTH
-        glu.gluQuadricTexture(quadric, true);           // memakai tekstur
-        loadSkyTexture();   // load tekstur sky
+        quadric = glu.gluNewQuadric();                 
+        glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH); 
+        glu.gluQuadricTexture(quadric, true);  
+        loadSkyTexture();  
     }
 
-    // load file heightmap
     public void loadFile(String filename)
     {
-        //textureFile = filename.substring(0, filename.length() - 4) + ".png";
-        //System.out.println("nama tekstur : " + textureFile);
-        //setTexture();
+
         try { loadRawFile(filename, heightMap); }
         catch (IOException e) { throw new RuntimeException(e); }
     }
 
-    // ketika viewpost berubah
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
     {
         GL gl = drawable.getGL();        
@@ -116,7 +93,7 @@ public class GLRenderer implements GLEventListener
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glLoadIdentity();
 
-        glu.gluPerspective(45, (float) width / height, 1, 10000);   // near plane 10000
+        glu.gluPerspective(45, (float) width / height, 1, 10000);  
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
 
@@ -130,8 +107,6 @@ public class GLRenderer implements GLEventListener
         enableCullingMode(!cullingMode);
 
         gl.glLoadIdentity();
-
-        // setting camera, didapatkan dari kelas kamera
         Vector3 camPosition = camera.getCameraPosition();
         Vector3 camTarget = camera.getCameraTarget();
         Vector3 upVector = camera.getUpVector();
@@ -145,30 +120,27 @@ public class GLRenderer implements GLEventListener
                 upVector.Y,
                 upVector.Z);
 
-        // proses transformasi
+        
         gl.glScalef(scaleValue, scaleValue * HEIGHT_RATIO, scaleValue);    // scaling
-        setLightning(gl);   // mengatur lightning
-        // bind tekstur terrain
+        setLightning(gl);  
         gl.glBindTexture(GL.GL_TEXTURE_2D, textures[terrainFilter * 3 + textureFilter]);
 
-        gl.glEnable(GL.GL_LIGHT0);  // enable lightning
+        gl.glEnable(GL.GL_LIGHT0); 
         gl.glEnable(GL.GL_LIGHTING);
         renderHeightMap(gl, heightMap);
-        gl.glDisable(GL.GL_LIGHT0); // disable lightning
+        gl.glDisable(GL.GL_LIGHT0); 
         gl.glDisable(GL.GL_LIGHTING);
 
-        drawSky();  // menggambar skysphere
+        drawSky();  
         
         gl.glFlush();
     }
 
-    // jika display berubah
     public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) 
     {
     }
 
 
-    // fungsi render untuk heightmap
     private void renderHeightMap(GL gl, byte[] pHeightMap) 
     {
         if(renderType == RenderType.LINE)
@@ -179,17 +151,15 @@ public class GLRenderer implements GLEventListener
         for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
             for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE) 
             {
-                // vertex bawah kiri
                 int x = X;
                 int y = height(pHeightMap, X, Y);
                 int z = Y;
                 if(renderType == RenderType.TEXTURED)
-                    gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);  // kalau pakai tekstur
+                    gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);  
                 else
-                    setVertexColor(gl, pHeightMap, x, z);   // kalau tanpda tekstur
+                    setVertexColor(gl, pHeightMap, x, z); 
                 gl.glVertex3i(x, y, z);                          
 
-                // vertex atas kiri
                 x = X;
                 y = height(pHeightMap, X, Y + STEP_SIZE);
                 z = Y + STEP_SIZE;
@@ -198,8 +168,6 @@ public class GLRenderer implements GLEventListener
                 else
                     setVertexColor(gl, pHeightMap, x, z);
                 gl.glVertex3i(x, y, z);
-
-                // vertex atas kanan
                 x = X + STEP_SIZE;
                 y = height(pHeightMap, X + STEP_SIZE, Y + STEP_SIZE);
                 z = Y + STEP_SIZE;
@@ -209,7 +177,6 @@ public class GLRenderer implements GLEventListener
                     setVertexColor(gl, pHeightMap, x, z);
                 gl.glVertex3i(x, y, z);
 
-                // vertex bawah kanan
                 x = X + STEP_SIZE;
                 y = height(pHeightMap, X + STEP_SIZE, Y);
                 z = Y;
@@ -224,15 +191,12 @@ public class GLRenderer implements GLEventListener
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // reset
     }
     
-    
-    // mengatur warna wertex yang tergantung pada ketinggian dari vertex tersebut
-    private void setVertexColor(GL gl, byte[] pHeightMap, int x, int y) 
+        private void setVertexColor(GL gl, byte[] pHeightMap, int x, int y) 
     {
         int height = height(pHeightMap, x, y);
         if(renderType != RenderType.MULTICOLOR)
         {            
             float fColor = 0.1f + (height / 256.0f);
-            // menambahkan warna biru ke vertex
             gl.glColor3f(0, 0, fColor);
         }
         else
@@ -253,28 +217,23 @@ public class GLRenderer implements GLEventListener
     }
     
     
-    // Fungsi ini mengembalikan ketinggian dari indeks heightmap
     private int height(byte[] pHeightMap, int X, int Y) 
     { 
-        int x = X % MAP_SIZE; // error check pada nilai x
-        int y = Y % MAP_SIZE; // error check pana nilai y
-        // melakukan pengindeks-an pada heightmap
-        // dan mengembalikan nilai ketingiiannya
+        int x = X % MAP_SIZE; 
+        int y = Y % MAP_SIZE;
         return pHeightMap[x + (y * MAP_SIZE)] & 0xFF; 
     }
 
-    // fungsi untuk mendapatkan data dari file raw
     private void loadRawFile(String strName, byte[] pHeightMap) throws IOException
     {
-        InputStream input = ResourceGrabber.getResourceAsStream(strName);  // mendapatkan InputStream dari file
-        readBuffer(input, pHeightMap);  // baca buffer
-        input.close();  // tutup InputStream
+        InputStream input = ResourceGrabber.getResourceAsStream(strName);  
+        readBuffer(input, pHeightMap); 
+        input.close(); 
 
         for (int i = 0; i < pHeightMap.length; i++)
-            pHeightMap[i] &= 0xFF;  // quick fix
+            pHeightMap[i] &= 0xFF; 
     }
 
-    // pembacaan buffer agar didapat data dari warna-warna grayscale
     private static void readBuffer(InputStream in, byte[] buffer) throws IOException
     {
         int bytesRead = 0;
@@ -286,7 +245,6 @@ public class GLRenderer implements GLEventListener
         }
     }
 
-    // setting tekstur
     private void makeRGBTexture(GL gl,
             GLU glu,
             TextureReader.Texture img,
@@ -303,7 +261,6 @@ public class GLRenderer implements GLEventListener
 
     }
 
-    // fungsi pengaturan lightning
     private void setLightning(GL gl)
     {
         gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
@@ -313,7 +270,6 @@ public class GLRenderer implements GLEventListener
         gl.glEnable(GL.GL_LIGHTING);
     }
 
-    // load tekstur sky
     private void loadSkyTexture()
     {
         String textureName = "sky.png";
@@ -324,13 +280,6 @@ public class GLRenderer implements GLEventListener
             e.printStackTrace();
             throw new RuntimeException(e); }
 
-        // Setting tekstur skysphere dengan "Linear Texture"
-//        _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-//        _gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB8, texture.getWidth(), texture.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
-//        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-//        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-
-        // setting tekxture skysphere dengan "Mipmapped Texture"
         _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -338,38 +287,34 @@ public class GLRenderer implements GLEventListener
                     texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
     }
 
-    // menggambar skysphere, skysphere dibelah menjadi dua bagian setengah bola, atas dan bawah
-    // bagian atas dirotasi sehingga terkesan efek awan bergerak, sedangkan bagian bawah diam
+
     private void drawSky()
     {
         Vector3 camPosition = camera.getCameraPosition();
         _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
         enableCullingMode(false);
 
-        // menggambar sphere atas (bergerak)
-        _gl.glPushMatrix(); // save state
+        _gl.glPushMatrix(); 
         _gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
-        _gl.glRotatef(skyMovCounter, 0.0f, 0.0f, 1.0f); // untuk efek awan
+        _gl.glRotatef(skyMovCounter, 0.0f, 0.0f, 1.0f); 
         _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
         double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
-        _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0);  // potong bawah
+        _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE1);
         glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE1);
-        _gl.glPopMatrix();  // restore state
-
-        // menggambar sphere bawah (diam)
-        _gl.glPushMatrix(); // save state
+        _gl.glPopMatrix();  
+        _gl.glPushMatrix(); 
         _gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
         _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
         double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
-        _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0);  // potong atas
+        _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE2);       
         glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE2);
-        _gl.glPopMatrix();  // restore state
+        _gl.glPopMatrix();  
 
-        skyMovCounter += 0.05f;  // sudut rotasi ditambah
+        skyMovCounter += 0.05f; 
     }
 
     /*
@@ -381,7 +326,6 @@ public class GLRenderer implements GLEventListener
      */
     private void setTexture()
     {
-        //_gl.glDeleteTextures(this.textures.length, this.textures, 0);
         textures = new int[12];
 
         _gl.glEnable(GL.GL_TEXTURE_2D);
@@ -521,7 +465,6 @@ public class GLRenderer implements GLEventListener
         this.scaleValue = scaleValue;
     }
 
-    // untuk setting culling
     private void enableCullingMode(boolean value)
     {
         if(value)
@@ -534,13 +477,11 @@ public class GLRenderer implements GLEventListener
             _gl.glDisable(_gl.GL_CULL_FACE);
     }
 
-    // apakah culling mode?
     public boolean isCullingMode()
     {
         return cullingMode;
     }
 
-    // mengatur settingan culling
     public void setCullingMode(boolean cullingMode)
     {
         this.cullingMode = cullingMode;
