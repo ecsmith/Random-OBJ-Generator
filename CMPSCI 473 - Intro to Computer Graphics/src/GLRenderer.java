@@ -414,7 +414,7 @@ public class GLRenderer implements GLEventListener
 
         // HEIGHTFIELD /////////////////////////////////////////////////////////
 
-        try { texture = TextureReader.readTexture("Heightfield.png"); }
+        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getName()); }
         catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e); }

@@ -38,7 +38,8 @@ import javax.swing.WindowConstants;
 
 public class HeightmapTerrain extends JFrame {
 
-    private Animator animator;          
+    public static File file;
+	private Animator animator;          
     private GLRenderer renderer;        
     private static byte[] input_bytes = null;
 
@@ -223,7 +224,7 @@ public class HeightmapTerrain extends JFrame {
 			        int returnVal = fc.showOpenDialog(null);
 
 			        if (returnVal == JFileChooser.APPROVE_OPTION) {
-			            File file = fc.getSelectedFile();
+			            file = fc.getSelectedFile();
 
 			            //This is where a real application would open the file.
 			            System.out.println("Opening: " + file.getName() + ".\n");
