@@ -1,9 +1,6 @@
-README.txt
-
-The .pdf version of the document is for aesthetic purposes only. 
-The .docx format removed some of my da.sdjfaskdjhfbaskdjfhbas
-df,asjdbfkjashdb
-ajhsdbfaksjhdfbaks
-kjahsbdfkjashdbfaskj
-ajkshdfaskjhdfbpreffered fonts and stylings.
-Content for both however is the same.
+>>> eric smith  emma simon <<<
+>> >> c m p s c i - 4 7 3 << <<
+ 
+Our Final Project For Introduction
+to Computer Graphics 473 @ Umass
+Amherst. 
