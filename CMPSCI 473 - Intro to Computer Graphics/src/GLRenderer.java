@@ -62,7 +62,7 @@ public class GLRenderer implements GLEventListener
         gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
         if(filename == null)
-            loadFile("Heightfield.bmp");    
+            loadFile("Terrain2.raw");    
         else
             loadFile(filename);
 

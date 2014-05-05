@@ -168,13 +168,13 @@ public class HeightmapTerrain extends JFrame {
             renderer.camera.rotateY(-2.0f);
         else if(button == KeyEvent.VK_LEFT)         
             renderer.camera.rotateY(2.0f);
-        else if(button == KeyEvent.VK_W)            
+        else if(button == KeyEvent.VK_COMMA)            
             renderer.camera.moveForward(-1.0f);
-        else if(button == KeyEvent.VK_A)           
+        else if(button == KeyEvent.VK_SEMICOLON)           
             renderer.camera.strafeRight(-1.0f);
-        else if(button == KeyEvent.VK_S)            
+        else if(button == KeyEvent.VK_PERIOD)            
             renderer.camera.moveForward(2.0f);
-        else if(button == KeyEvent.VK_D)         
+        else if(button == KeyEvent.VK_QUOTE)         
             renderer.camera.strafeRight(1.0f);
         else if(button == KeyEvent.VK_Q)           
             renderer.camera.moveUpward(1.0f);
