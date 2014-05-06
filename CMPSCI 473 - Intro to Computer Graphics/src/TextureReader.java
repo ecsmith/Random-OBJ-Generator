@@ -26,6 +26,14 @@ public class TextureReader
 
         return readPixels(bufferedImage, storeAlphaChannel);
     }
+    
+    public static Texture readTexture(BufferedImage bufferedImage) {
+    	return readPixels(bufferedImage, false);
+	}
+    
+    public static Texture readTexture(BufferedImage bufferedImage, boolean storeAlphaChannel) {
+    	return readPixels(bufferedImage, storeAlphaChannel);
+    }
 
     
     private static BufferedImage readImage(String resourceName) throws IOException

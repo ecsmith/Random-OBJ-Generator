@@ -20,7 +20,7 @@ public class ThreadHeightmap extends Thread
         {
             try
             {
-                Thread.sleep(30);
+                Thread.sleep(17);
                 this.obj.repaint();
             }
             catch (InterruptedException ex)
