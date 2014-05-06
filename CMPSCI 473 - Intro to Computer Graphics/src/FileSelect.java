@@ -17,6 +17,7 @@ class FileSelect
             int returnVal = fc.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
+            	
                 File file = fc.getSelectedFile();
 
                 //This is where a real application would open the file.

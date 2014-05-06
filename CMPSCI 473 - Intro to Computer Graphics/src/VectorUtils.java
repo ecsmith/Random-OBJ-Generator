@@ -1,14 +1,9 @@
-
-/**
- * Kelas utilitas yang digunakan untuk operasi perhitungan vektor 3 dimensi
- */
 public class VectorUtils
 {
     public VectorUtils()
     {
     }
 
-    // penambahan vektor dengan vektor
     public Vector3 Vector3Addition(Vector3 u, Vector3 v)
     {
         Vector3 w = new Vector3();
@@ -20,7 +15,6 @@ public class VectorUtils
         return w;
     }
 
-    // pengurangan vektor dengan vektor
     public Vector3 Vector3Substraction(Vector3 u, Vector3 v)
     {
         Vector3 w = new Vector3();
@@ -32,7 +26,6 @@ public class VectorUtils
         return w;
     }
 
-    // perkalian vektor dengan skalar
     public Vector3 Vector3Multiplication(Vector3 u, float r)
     {
         Vector3 w = new Vector3();
@@ -44,7 +37,6 @@ public class VectorUtils
         return w;
     }
 
-    // cross product vektor dengan vektor
     public Vector3 Vector3CrossProduct(Vector3 u, Vector3 v)
     {
         Vector3 w = new Vector3();
@@ -56,7 +48,6 @@ public class VectorUtils
         return w;
     }
 
-    // dot product vektor dengan vektor
     public float Vector3DotProduct(Vector3 u, Vector3 v)
     {
         return (v.X * u.X) + (v.Y * u.Y) + (v.Z * u.Z);

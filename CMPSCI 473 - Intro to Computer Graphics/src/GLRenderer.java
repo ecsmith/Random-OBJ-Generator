@@ -11,7 +11,7 @@ public class GLRenderer implements GLEventListener
     private RenderType renderType;                            
     private static final int MAP_SIZE = 1024;                 
     private static final int STEP_SIZE = 4;                     
-    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];  
+    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];
     private float scaleValue = 0.10f;                          
     private float HEIGHT_RATIO = 1.0f;                          
     private float skyMovCounter = 0.0f;                       
@@ -61,8 +61,9 @@ public class GLRenderer implements GLEventListener
        
         gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
+         
         if(filename == null)
-            loadFile("Heightfield.bmp");    
+            loadFile("Terrain2.raw");    
         else
             loadFile(filename);
 
@@ -301,7 +302,7 @@ public class GLRenderer implements GLEventListener
         double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
         _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE1);
-        glu.gluSphere(quadric, 5000, 50, 5);
+        //glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE1);
         _gl.glPopMatrix();  
         _gl.glPushMatrix(); 
@@ -310,7 +311,7 @@ public class GLRenderer implements GLEventListener
         double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
         _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE2);       
-        glu.gluSphere(quadric, 5000, 50, 5);
+        //glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE2);
         _gl.glPopMatrix();  
 
@@ -414,7 +415,7 @@ public class GLRenderer implements GLEventListener
 
         // HEIGHTFIELD /////////////////////////////////////////////////////////
 
-        try { texture = TextureReader.readTexture("Heightfield.png"); }
+        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
         catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e); }
@@ -439,19 +440,16 @@ public class GLRenderer implements GLEventListener
 
     }
 
-    // mendapatkan tipe render
     public RenderType getRenderType()
     {
         return renderType;
     }
 
-    // mengatur tipe render
     public void setRenderType(RenderType renderType)
     {
         this.renderType = renderType;
     }
 
-    // medapatkan skala terrain
     public float getScaleValue()
     {
         return scaleValue;

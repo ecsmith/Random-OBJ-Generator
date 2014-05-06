@@ -1,13 +1,26 @@
 
 import com.sun.opengl.util.Animator;
+
+import java.awt.AWTException;
+import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
@@ -36,24 +49,33 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 
-public class HeightmapTerrain extends JFrame {
+public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotionListener {
 
-    private Animator animator;          
+    public static File file;
+	private Animator animator;          
     private GLRenderer renderer;        
     private static byte[] input_bytes = null;
+    private static Robot robot;
+    private static int canvasheight, canvaswidth;
 
     public ThreadHeightmap repainter;   
 
     
     public HeightmapTerrain()
     {
-        initComponents();
+        initialize();
         
         renderer = new GLRenderer();
         heightmapCanvas.addGLEventListener(renderer);
         animator = new Animator(heightmapCanvas);
-
-        heightmapCanvas.requestFocus();        
+        
+        try {
+			robot = new Robot();
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		}
+        
+        heightmapCanvas.requestFocus();
 
         this.addWindowListener(new WindowAdapter()
         {
@@ -96,22 +118,13 @@ public class HeightmapTerrain extends JFrame {
     }
 
     @SuppressWarnings("unchecked")
-    private void initComponents() {
+    private void initialize() {
 
         heightmapCanvas = new GLCanvas();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Heightmap Landscape");
-        addMouseMotionListener(new MouseMotionAdapter() {
-            public void mouseDragged(MouseEvent evt) {
-                formMouseDragged(evt);
-            }
-        });
-        addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent evt) {
-                formKeyPressed(evt);
-            }
-        });
+        addKeyListener(this);
 
         heightmapCanvas.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent evt) {
@@ -123,11 +136,8 @@ public class HeightmapTerrain extends JFrame {
                 heightmapCanvasMouseClicked(evt);
             }
         });
-        heightmapCanvas.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent evt) {
-                heightmapCanvasKeyPressed(evt);
-            }
-        });
+        heightmapCanvas.addMouseMotionListener(this);
+        heightmapCanvas.addKeyListener(this);
 
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -146,6 +156,9 @@ public class HeightmapTerrain extends JFrame {
         );
 
         pack();
+        canvasheight = heightmapCanvas.getHeight();
+        canvaswidth = heightmapCanvas.getWidth();
+
     }
 
     private void formMouseDragged(MouseEvent evt) {
@@ -154,47 +167,6 @@ public class HeightmapTerrain extends JFrame {
 
     private void formKeyPressed(KeyEvent evt) {
         // TODO add your handling code here:
-    }
-
-    private void heightmapCanvasKeyPressed(KeyEvent evt) {
-        int button = evt.getKeyCode();
-        float scale = renderer.getScaleValue();
-
-        if(button == KeyEvent.VK_UP)               
-            renderer.camera.rotateX(2.0f);
-        else if(button == KeyEvent.VK_DOWN)         
-            renderer.camera.rotateX(-2.0f);
-        else if(button == KeyEvent.VK_RIGHT)        
-            renderer.camera.rotateY(-2.0f);
-        else if(button == KeyEvent.VK_LEFT)         
-            renderer.camera.rotateY(2.0f);
-        else if(button == KeyEvent.VK_W)            
-            renderer.camera.moveForward(-1.0f);
-        else if(button == KeyEvent.VK_A)           
-            renderer.camera.strafeRight(-1.0f);
-        else if(button == KeyEvent.VK_S)            
-            renderer.camera.moveForward(2.0f);
-        else if(button == KeyEvent.VK_D)         
-            renderer.camera.strafeRight(1.0f);
-        else if(button == KeyEvent.VK_Q)           
-            renderer.camera.moveUpward(1.0f);
-        else if(button == KeyEvent.VK_E)           
-            renderer.camera.moveUpward(-1.0f);
-         else if(button == KeyEvent.VK_Z)        
-            renderer.camera.rotateZ(-2.0f);
-        else if(button == KeyEvent.VK_X)          
-            renderer.camera.rotateZ(2.0f);
-        else if(button == KeyEvent.VK_PAGE_UP)     
-            renderer.setScaleValue(scale + 0.01f);
-        else if(button == KeyEvent.VK_PAGE_DOWN)   
-            renderer.setScaleValue(scale - 0.01f);
-        else if(button == KeyEvent.VK_1)               
-            renderer.setRenderType(RenderType.LINE);
-        else if(button == KeyEvent.VK_2)
-            renderer.setRenderType(RenderType.TEXTURED);
-        else if(button == KeyEvent.VK_ESCAPE)
-            System.exit(0);
-
     }
 
     private void heightmapCanvasMouseWheelMoved(MouseWheelEvent evt) {
@@ -223,7 +195,7 @@ public class HeightmapTerrain extends JFrame {
 			        int returnVal = fc.showOpenDialog(null);
 
 			        if (returnVal == JFileChooser.APPROVE_OPTION) {
-			            File file = fc.getSelectedFile();
+			            file = fc.getSelectedFile();
 
 			            //This is where a real application would open the file.
 			            System.out.println("Opening: " + file.getName() + ".\n");
@@ -238,6 +210,7 @@ public class HeightmapTerrain extends JFrame {
 
 			                
 			                rand_file.close(); 
+			                
 			               } catch (IOException e) {//If the file is not found
 			       			e.printStackTrace();  //Print trace the error
 			       		}
@@ -266,9 +239,125 @@ public class HeightmapTerrain extends JFrame {
                 }
                 
                 HeightmapTerrain frame = new HeightmapTerrain();
+                
+                //height = frame.getHeight();
+                //width = frame.getWidth();
                 frame.setVisible(true);
+                hideCursor(frame);
+                curX = canvaswidth/2;
+            	curY = canvasheight/2;
+            	//robot.mouseMove(width/2, height/2);
             }
         });
     }
     private GLCanvas heightmapCanvas;
+
+    private static void hideCursor(JFrame frame) {
+    	//Create an empty byte array  
+    	byte[]imageByte=new byte[0];  
+    	  
+    	Cursor emptyCursor;  
+    	Point myPoint=new Point(0,0);  
+    	  
+    	//Create image for cursor using empty array  
+    	Image cursorImage=Toolkit.getDefaultToolkit().createImage(imageByte); 
+    	emptyCursor=Toolkit.getDefaultToolkit().createCustomCursor(cursorImage,myPoint,"cursor");
+    	frame.setCursor(emptyCursor);
+    }
+
+	@Override
+	public void keyPressed(KeyEvent evt) {
+        int button = evt.getKeyCode();
+        float scale = renderer.getScaleValue();
+
+        switch (evt.getKeyCode()) {
+        case (KeyEvent.VK_UP):               
+            renderer.camera.rotateX(2.0f);
+        	break;
+        case (KeyEvent.VK_DOWN):         
+            renderer.camera.rotateX(-2.0f);
+        	break;
+        case (KeyEvent.VK_RIGHT):      
+            renderer.camera.rotateY(-2.0f);
+        	break;
+        case (KeyEvent.VK_LEFT):       
+            renderer.camera.rotateY(2.0f);
+        	break;
+        case (KeyEvent.VK_COMMA):
+        case (KeyEvent.VK_W):         
+            renderer.camera.moveForward(-1.0f);
+        	break;
+        case (KeyEvent.VK_SEMICOLON):
+        case (KeyEvent.VK_A):
+        	renderer.camera.strafeRight(-1.0f);
+        	break;
+        case (KeyEvent.VK_PERIOD):
+        case (KeyEvent.VK_S): 
+            renderer.camera.moveForward(2.0f);
+        	break;
+        case (KeyEvent.VK_QUOTE):
+        case (KeyEvent.VK_D): 
+            renderer.camera.strafeRight(1.0f);
+        	break;
+        case (KeyEvent.VK_Q):           
+            renderer.camera.moveUpward(1.0f);
+        	break;
+        case (KeyEvent.VK_E):           
+            renderer.camera.moveUpward(-1.0f);
+        	break;
+        case (KeyEvent.VK_Z):        
+            renderer.camera.rotateZ(-2.0f);
+         	break;
+        case (KeyEvent.VK_X):          
+            renderer.camera.rotateZ(2.0f);
+        	break;
+        case (KeyEvent.VK_PAGE_UP):     
+            renderer.setScaleValue(scale + 0.01f);
+        	break;
+        case (KeyEvent.VK_PAGE_DOWN):   
+            renderer.setScaleValue(scale - 0.01f);
+        	break;
+        case (KeyEvent.VK_1):               
+            renderer.setRenderType(RenderType.LINE);
+        	break;
+        case (KeyEvent.VK_2):
+            renderer.setRenderType(RenderType.TEXTURED);
+        	break;
+        case (KeyEvent.VK_ESCAPE):
+            System.exit(0);
+        	break;
+        }
+		
+	}
+
+	static int curX;
+	static int curY;
+
+	private boolean ignoreRobotMove = false;
+	
+	public void mouseMoved(MouseEvent e) {
+		if (!ignoreRobotMove) {
+			
+			int dx = MouseInfo.getPointerInfo().getLocation().x - (canvaswidth/2);
+			int dy = MouseInfo.getPointerInfo().getLocation().y - (canvasheight/2);
+			if(dx != 0) {     
+				float yrot = -(float)dx/100;
+	            renderer.camera.rotateY(yrot);
+			}
+			
+	        if(dy != 0) {  
+	        	float xrot = -(float)dy/100;
+	            renderer.camera.rotateX(xrot);
+	        }
+	        
+	        robot.mouseMove(canvaswidth/2, canvasheight/2);
+	        ignoreRobotMove = true;
+		} else {
+			ignoreRobotMove = false;
+		}
+	}
+	
+	public void keyReleased(KeyEvent arg0) {}
+	public void keyTyped(KeyEvent arg0) {}
+	public void mouseDragged(MouseEvent arg0) {}
 }
