@@ -51,7 +51,7 @@ import javax.swing.WindowConstants;
 
 public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotionListener {
 
-    public static File file;
+    public static File file = new File(System.getProperty("user.dir"));
 	private Animator animator;          
     private GLRenderer renderer;        
     private static byte[] input_bytes = null;
@@ -191,7 +191,8 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 
 			    @Override
 			    public void run() {
-			        JFileChooser fc = new JFileChooser();
+			        JFileChooser fc = new JFileChooser("");
+			        fc.setCurrentDirectory(file);
 			        int returnVal = fc.showOpenDialog(null);
 
 			        if (returnVal == JFileChooser.APPROVE_OPTION) {
