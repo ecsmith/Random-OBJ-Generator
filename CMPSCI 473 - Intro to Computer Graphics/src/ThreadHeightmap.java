@@ -3,13 +3,10 @@ import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
 
 
-/**
- * Kelas untuk me-refresh otomatis GLJPanel
- */
 public class ThreadHeightmap extends Thread
 {
 
-    GLCanvas obj;   // objek GLJPanel
+    GLCanvas obj;  
 
     public ThreadHeightmap(GLCanvas canvas)
     {
@@ -23,8 +20,7 @@ public class ThreadHeightmap extends Thread
         {
             try
             {
-                // refresh rate -60 per detik
-                Thread.sleep(17);
+                Thread.sleep(30);
                 this.obj.repaint();
             }
             catch (InterruptedException ex)
