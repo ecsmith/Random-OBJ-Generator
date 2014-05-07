@@ -10,6 +10,7 @@ import java.util.Random;
 
 public class TextureReader
 {  
+
 	public static Texture readTexture(String filename) throws IOException
 	{
 		return readTexture(filename, false);
@@ -22,7 +23,6 @@ public class TextureReader
 			bufferedImage = BitmapLoader.loadBitmap(filename);
 		else    
 			bufferedImage = readImage(filename);
-
 
 		return readPixels(bufferedImage, storeAlphaChannel, false);
 	}
@@ -69,13 +69,13 @@ public class TextureReader
 		ByteBuffer unpackedPixels = BufferUtil.newByteBuffer(packedPixels.length * bytesPerPixel);
 
 		if (anim){
-			Random r = new Random(); 
+			Random r = new Random();
 			for (int row = img.getHeight() - 1; row >= 0; row--)
 			{
 				for (int col = 0; col < img.getWidth(); col++)
 				{
 					int packedPixel = packedPixels[row * img.getWidth() + col];
-					unpackedPixels.put((byte) ((packedPixel >> 16) &  0xFF));
+					unpackedPixels.put((byte) ((packedPixel >> r.nextInt(16)) &  0xFF));
 					unpackedPixels.put((byte) ((packedPixel >> r.nextInt(8)) &  0xFF));
 					unpackedPixels.put((byte) ((packedPixel >> 0) & 0xFF));
 					if (storeAlphaChannel)
