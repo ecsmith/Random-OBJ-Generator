@@ -21,14 +21,10 @@ public class GLRenderer implements GLEventListener
     private float skyMovCounter = 0.0f;                       
     private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};       
     private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};        
-    private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f}; 
-    public int terrainFilter = 3;                               
-    public int textureFilter = 2;                               
-    private int[] textures = new int[3];                     
+    private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f};                             
+    private int[] textures = new int[1];                     
     private int skyTexture;                                    
-    private boolean cullingMode = false;                       
     private GLU glu = new GLU();                            
-    private GLUquadric quadric;     
     private GLUT glut;
     private GL _gl;                                            
     public String filename = null;                           
@@ -70,23 +66,14 @@ public class GLRenderer implements GLEventListener
             loadFile("Terrain2.raw");    
         else
             loadFile(filename);
-
         setTexture();  
-
         setLightning(gl);  
-
-        quadric = glu.gluNewQuadric();                 
-        glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH); 
-        glu.gluQuadricTexture(quadric, true);  
         loadSkyTexture();  
     }
 
     public void loadFile(String filename)
     {
-
     	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .5, 600);
-       //try { loadRawFile(filename, heightMap); }
-       //catch (IOException e) { throw new RuntimeException(e); }
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
@@ -110,8 +97,6 @@ public class GLRenderer implements GLEventListener
         GL gl = drawable.getGL();
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
-        enableCullingMode(!cullingMode);
-
         gl.glLoadIdentity();
         Vector3 camPosition = camera.getCameraPosition();
         Vector3 camTarget = camera.getCameraTarget();
@@ -129,7 +114,7 @@ public class GLRenderer implements GLEventListener
         
         gl.glScalef(scaleValue, scaleValue * HEIGHT_RATIO, scaleValue);    // scaling
         setLightning(gl);  
-        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[terrainFilter * 3 + textureFilter]);
+        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
         gl.glEnable(GL.GL_LIGHT0); 
         gl.glEnable(GL.GL_LIGHTING);
         renderHeightMap(gl, heightMap);
@@ -229,16 +214,6 @@ public class GLRenderer implements GLEventListener
         return pHeightMap[x + (y * MAP_SIZE)] & 0xFF; 
     }
 
-    private void loadRawFile(String strName, byte[] pHeightMap) throws IOException
-    {
-        InputStream input = ResourceGrabber.getResourceAsStream(strName);  
-        readBuffer(input, pHeightMap); 
-        input.close(); 
-
-        for (int i = 0; i < pHeightMap.length; i++)
-            pHeightMap[i] &= 0xFF; 
-    }
-
     private static void readBuffer(InputStream in, byte[] buffer) throws IOException
     {
         int bytesRead = 0;
@@ -298,17 +273,9 @@ public class GLRenderer implements GLEventListener
     }
     
     
-    private void makeRGBTexture(GL gl,
-            GLU glu,
-            TextureReader.Texture img,
-            int target,
-            boolean mipmapped)
+    private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
     {
 
-        if (mipmapped)
-            glu.gluBuild2DMipmaps(target, GL.GL_RGB8, img.getWidth(),
-                    img.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
-        else
             gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
                     img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
 
@@ -345,7 +312,6 @@ public class GLRenderer implements GLEventListener
     {
         Vector3 camPosition = camera.getCameraPosition();
         _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-        enableCullingMode(false);
 
         _gl.glPushMatrix(); 
         _gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
@@ -355,7 +321,6 @@ public class GLRenderer implements GLEventListener
         _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE1);
         glut.glutSolidSphere(5000, 50, 5);
-//        glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE1);
         _gl.glPopMatrix();  
         _gl.glPushMatrix(); 
@@ -365,7 +330,6 @@ public class GLRenderer implements GLEventListener
         _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
         _gl.glEnable(GL.GL_CLIP_PLANE2);    
         glut.glutSolidSphere(5000, 50, 5);
-//        glu.gluSphere(quadric, 5000, 50, 5);
         _gl.glDisable(GL.GL_CLIP_PLANE2);
         _gl.glPopMatrix();  
 
@@ -374,154 +338,39 @@ public class GLRenderer implements GLEventListener
     
     private void animateTerrain()
     {
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[terrainFilter * 3 + textureFilter]);
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
         _gl.glPushMatrix(); 
-        TextureReader.Texture texture = null;
+        TextureReader.Texture texture;
         try {
 			texture = TextureReader.animateTexture((HeightmapTerrain.file.getAbsolutePath()));
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-        // Nearest Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[9]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Linear Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[10]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Mipmapped Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[11]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, true);
-        _gl.glPopMatrix();  
-    }
-
-    /*
-     * 0 - Acker Rock
-     * 1 - Terrain 1
-     * 2 - Terrain 2
-     * 3 - Heighfield
-     * 
-     */
-    private void setTexture()
-    {
-        textures = new int[12];
-
-        _gl.glEnable(GL.GL_TEXTURE_2D);
-
-        TextureReader.Texture texture = null;
-
-        // ACKER ROCK //////////////////////////////////////////////////////////
-        try { texture = TextureReader.readTexture("Acker_Rock.png"); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
-        
-        _gl.glGenTextures(12, this.textures, 0);
-
-        // Nearest Filtered Texture
         _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
+        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
+        _gl.glPopMatrix();  
+    }
 
-        // Linear Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[1]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
+    private void setTexture()
+    {
+        textures = new int[1];
 
-        // Mipmapped Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[2]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, true);
-        
-        texture = null;
+        _gl.glEnable(GL.GL_TEXTURE_2D);
 
-        // TERRAIN I ///////////////////////////////////////////////////////////
-        try { texture = TextureReader.readTexture("Terrain1.png"); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
-
-        // Nearest Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[3]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Linear Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[4]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Mipmapped Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[5]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, true);
-
-        texture = null;
-
-        // TERRAIN II //////////////////////////////////////////////////////////
-        try { texture = TextureReader.readTexture("Terrain2.png"); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
-
-        // Nearest Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[6]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Linear Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[7]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Mipmapped Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[8]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, true);
-
-        texture = null;
-
-        // HEIGHTFIELD /////////////////////////////////////////////////////////
+        TextureReader.Texture texture;
 
         try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
         catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e); }
 
-        // Nearest Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[9]);
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Linear Filtered Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[10]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, false);
-
-        // Mipmapped Texture
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[11]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D, true);
+        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
 
     }
 
@@ -548,25 +397,5 @@ public class GLRenderer implements GLEventListener
         this.scaleValue = scaleValue;
     }
 
-    private void enableCullingMode(boolean value)
-    {
-        if(value)
-        {
-            _gl.glCullFace(_gl.GL_BACK);
-            _gl.glEnable(_gl.GL_CULL_FACE);
-            _gl.glFrontFace(_gl.GL_CCW);
-        }
-        else
-            _gl.glDisable(_gl.GL_CULL_FACE);
-    }
 
-    public boolean isCullingMode()
-    {
-        return cullingMode;
-    }
-
-    public void setCullingMode(boolean cullingMode)
-    {
-        this.cullingMode = cullingMode;
-    }
 }

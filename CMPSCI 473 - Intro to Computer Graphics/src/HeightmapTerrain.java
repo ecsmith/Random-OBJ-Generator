@@ -328,11 +328,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
         case (KeyEvent.VK_ESCAPE):
             System.exit(0);
         	break;
-        case (KeyEvent.VK_R):
-        	try {Runtime.getRuntime().exec("java HeightmapTerrain");}
-			catch (IOException e) { e.printStackTrace() ;}
-        	System.exit(0);
-        	break;
         }
         
 		
