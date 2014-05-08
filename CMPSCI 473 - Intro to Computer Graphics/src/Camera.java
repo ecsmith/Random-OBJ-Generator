@@ -18,8 +18,6 @@ public class Camera
 
     float PiDiv180 = (float)Math.PI / 180.0f;   
 
-    VectorUtils vectorUtils = new VectorUtils();   
-
     public Camera()
     {
         reset();
@@ -41,7 +39,7 @@ public class Camera
 
     public void move(CustomVector3f direction)
     {
-        position = vectorUtils.Vector3Addition(position, direction);
+        position = CustomVector3f.Vector3Addition(position, direction);
     }
 
    
@@ -49,11 +47,11 @@ public class Camera
     {
         rotatedX += angle;
 
-        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
-        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = CustomVector3f.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = CustomVector3f.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
 
-        viewDir = vectorUtils.Vector3Addition(temp1, temp2).getNormal();
-        upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
+        viewDir = CustomVector3f.Vector3Addition(temp1, temp2).getNormal();
+        upVector = CustomVector3f.Vector3Multiplication(CustomVector3f.Vector3CrossProduct(viewDir, rightVector), -1.0f);
     }
 
  
@@ -61,12 +59,12 @@ public class Camera
     {
         rotatedY += angle;
 
-        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
-        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = CustomVector3f.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = CustomVector3f.Vector3Multiplication(rightVector, (float)Math.sin(angle * PiDiv180));
 
-        viewDir = vectorUtils.Vector3Substraction(temp2, temp1);
+        viewDir = CustomVector3f.Vector3Substraction(temp2, temp1);
         viewDir = viewDir.getNormal();
-        rightVector = vectorUtils.Vector3CrossProduct(viewDir, upVector);
+        rightVector = CustomVector3f.Vector3CrossProduct(viewDir, upVector);
     }
 
   
@@ -74,29 +72,29 @@ public class Camera
     {
         rotatedZ += angle;
 
-        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.cos(angle * PiDiv180));
-        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = CustomVector3f.Vector3Multiplication(rightVector, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = CustomVector3f.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
 
-        rightVector = vectorUtils.Vector3Addition(temp1, temp2).getNormal();
-        upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
+        rightVector = CustomVector3f.Vector3Addition(temp1, temp2).getNormal();
+        upVector = CustomVector3f.Vector3Multiplication(CustomVector3f.Vector3CrossProduct(viewDir, rightVector), -1.0f);
     }
 
     
     public void moveForward(float distance)
     {
-        position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(viewDir, -distance));
+        position = CustomVector3f.Vector3Addition(position, CustomVector3f.Vector3Multiplication(viewDir, -distance));
     }
 
    
     public void strafeRight(float distance)
     {
-        position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(rightVector, distance));
+        position = CustomVector3f.Vector3Addition(position, CustomVector3f.Vector3Multiplication(rightVector, distance));
     }
 
     
     public void moveUpward(float distance)
     {
-        position = vectorUtils.Vector3Addition(position, vectorUtils.Vector3Multiplication(upVector, distance));
+        position = CustomVector3f.Vector3Addition(position, CustomVector3f.Vector3Multiplication(upVector, distance));
     }
 
     
@@ -108,7 +106,7 @@ public class Camera
    
     public CustomVector3f getCameraTarget()
     {
-        return vectorUtils.Vector3Addition(position, viewDir);
+        return CustomVector3f.Vector3Addition(position, viewDir);
     }
 
    
