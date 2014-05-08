@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.InputStream;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -7,8 +9,8 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.GLUT;
 
-public class GLRenderer implements GLEventListener
-{
+public class GLRenderer implements GLEventListener {
+
 	private RenderType renderType;
 	private static final int MAP_SIZE = 256;
 	private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
@@ -55,9 +57,6 @@ public class GLRenderer implements GLEventListener
 		gl.glDepthFunc(GL.GL_LEQUAL);
 		gl.glShadeModel(GL.GL_SMOOTH);
 
-
-
-
 		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
 		heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .9, 600);
@@ -65,8 +64,8 @@ public class GLRenderer implements GLEventListener
 		setTexture();
 		calcNorms(gl, heightMap);
 		setLightning(gl);
-
-		loadSkyTexture();
+		loadSphereTexture();
+		
 	}
 
 	@Override
@@ -93,9 +92,9 @@ public class GLRenderer implements GLEventListener
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
 		gl.glLoadIdentity();
-		Vector3 camPosition = camera.getCameraPosition();
-		Vector3 camTarget = camera.getCameraTarget();
-		Vector3 upVector = camera.getUpVector();
+		CustomVector3f camPosition = camera.getCameraPosition();
+		CustomVector3f camTarget = camera.getCameraTarget();
+		CustomVector3f upVector = camera.getUpVector();
 		glu.gluLookAt(camPosition.X,
 				camPosition.Y,
 				camPosition.Z,
@@ -116,8 +115,8 @@ public class GLRenderer implements GLEventListener
 		gl.glDisable(GL.GL_LIGHT0);
 		gl.glDisable(GL.GL_LIGHTING);
 
-		drawSky();
-		animateTerrain();
+		drawSphere();
+		animateColors();
 		gl.glFlush();
 	}
 
@@ -213,15 +212,118 @@ public class GLRenderer implements GLEventListener
 			}
 		}
 	}
+    
+        private void setVertexColor(GL gl, byte[] pHeightMap, int x, int y) 
+    {
+        int height = height(pHeightMap, x, y);
+        if(renderType != RenderType.MULTICOLOR)
+        {            
+            float fColor = 0.1f + (height / 256.0f);
+            gl.glColor3f(0, 0, fColor);
+        }
+        else
+        {
+            if(height >= 250)
+                gl.glColor3f(0.984313f, 0.3019607f, 0.3019607f);
+            else if(height > 200)
+                gl.glColor3f(1.0f, 0.5607843f, 0.243147f);
+            else if(height > 150)
+                gl.glColor3f(0.50196f, 1.0f, 0.50196f);
+            else if(height > 100)
+                gl.glColor3f(0.011764f, 0.55294117f, 0.1490196f);
+            else if(height > 50)
+                gl.glColor3f(0.011764f, 0.6862745f, 0.945098f);
+            else
+                gl.glColor3f(0.011764f, 0.270588f, 0.945098f);
+        }
+    }
+    
+    
+    private int height(byte[] pHeightMap, int X, int Y) 
+    { 
+        int x = X % MAP_SIZE; 
+        int y = Y % MAP_SIZE;
+        return pHeightMap[x + (y * MAP_SIZE)] & 0xFF; 
+    }
 
-	private void calcNorms(GL gl, int[][] pHeightMap)
+    private static void readBuffer(InputStream in, byte[] buffer) throws IOException
+    {
+        int bytesRead = 0;
+        int bytesToRead = buffer.length;
+        while (bytesToRead > 0) {
+            int read = in.read(buffer, bytesRead, bytesToRead);
+            bytesRead += read;
+            bytesToRead -= read;
+        }
+    }
+    
+    private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
+    {
+
+            gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
+                    img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
+
+    }
+
+    private void setLightning(GL gl)
+    {
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, this.lightDiffuse, 0);
+        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
+        gl.glEnable(GL.GL_LIGHT0);
+        gl.glEnable(GL.GL_LIGHTING);
+    }
+
+    private void loadSphereTexture()
+    {
+        String textureName = "sky.png";
+
+        TextureReader.Texture texture;
+        try { texture = TextureReader.readTexture(textureName); }
+        catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e); }
+
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
+        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+        glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, GL.GL_RGB8, texture.getWidth(),
+                    texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
+    }
+
+
+    private void drawSphere()
+    {
+        CustomVector3f camPosition = camera.getCameraPosition();
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
+
+        _gl.glPushMatrix(); 
+        _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+        double[] clipPlane1 = {0.0f, 0.0f, 0.0f, 0.0f};
+        _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
+        _gl.glEnable(GL.GL_CLIP_PLANE1);
+        glut.glutWireSphere(5000, 50, 5);
+        _gl.glDisable(GL.GL_CLIP_PLANE1);
+        _gl.glPopMatrix();  
+        _gl.glPushMatrix(); 
+        _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+        double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
+        _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
+        _gl.glEnable(GL.GL_CLIP_PLANE2);    
+        glut.glutWireSphere(5000, 50, 5);
+        _gl.glDisable(GL.GL_CLIP_PLANE2);
+        _gl.glPopMatrix();  
+
+    }
+    
+    private void calcNorms(GL gl, int[][] pHeightMap)
 	{
 		for (int x = 0; x < MAP_SIZE; x++) {
 			for (int y = 0; y < MAP_SIZE; y++) {
 				normal[x][y] = new Vector3f(0,0,0);
 			}
 		}
-
+			
 		int i = 0;
 		for (int X = 0; X < MAP_SIZE-1; X ++) {
 			for (int Y = 0; Y < MAP_SIZE-1; Y ++, i += 4) {
@@ -263,88 +365,26 @@ public class GLRenderer implements GLEventListener
 			l2.normalize();
 		}
 	}
-
-	private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
-	{
-
-		gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
-				img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
-
-	}
-
-	private void setLightning(GL gl)
-	{
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, this.lightDiffuse, 0);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
-		gl.glEnable(GL.GL_LIGHT0);
-		gl.glEnable(GL.GL_LIGHTING);
-	}
-
-	private void loadSkyTexture()
-	{
-		String textureName = "sky.png";
-
-		TextureReader.Texture texture;
-		try { texture = TextureReader.readTexture(textureName); }
-		catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e); }
-
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-		glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, GL.GL_RGB8, texture.getWidth(),
-				texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
-	}
-
-
-	private void drawSky()
-	{
-		Vector3 camPosition = camera.getCameraPosition();
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-
-		_gl.glPushMatrix();
-		_gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
-		_gl.glRotatef(skyMovCounter, 0.0f, 0.0f, 1.0f);
-		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
-		double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
-		_gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0);
-		_gl.glEnable(GL.GL_CLIP_PLANE1);
-		glut.glutSolidSphere(5000, 50, 5);
-		_gl.glDisable(GL.GL_CLIP_PLANE1);
-		_gl.glPopMatrix();
-		_gl.glPushMatrix();
-		_gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
-		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
-		double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
-		_gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0);
-		_gl.glEnable(GL.GL_CLIP_PLANE2);
-		glut.glutSolidSphere(5000, 50, 5);
-		_gl.glDisable(GL.GL_CLIP_PLANE2);
-		_gl.glPopMatrix();
-
-		skyMovCounter += 0.05f;
-	}
-
-	private void animateTerrain()
-	{
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-		_gl.glPushMatrix();
-		TextureReader.Texture texture;
-		try {
+    
+    private void animateColors()
+    {
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+        _gl.glPushMatrix(); 
+        TextureReader.Texture texture;
+        try {
 			texture = TextureReader.animateTexture((HeightmapTerrain.file.getAbsolutePath()));
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
-		_gl.glPopMatrix();
-	}
+        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
+        _gl.glPopMatrix();  
+    }
 
+    
 	private void setTexture()
 	{
 		textures = new int[1];
@@ -388,6 +428,5 @@ public class GLRenderer implements GLEventListener
 
 		this.scaleValue = scaleValue;
 	}
-
 
 }

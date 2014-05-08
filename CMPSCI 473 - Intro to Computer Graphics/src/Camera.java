@@ -2,15 +2,15 @@
 
 public class Camera
 {
-    Vector3 origViewDir = new Vector3(0.0f, -70.0f, -150.0f);
-    Vector3 origRightVector = new Vector3(1.0f, 0.0f, 0.0f);
-    Vector3 origUpVector = new Vector3(0.0f, 1.0f, 0.0f);
-    Vector3 origPosition = new Vector3(75.5f, 90.0f, 150.0f);
+    CustomVector3f origViewDir = new CustomVector3f(0.0f, -70.0f, -150.0f);
+    CustomVector3f origRightVector = new CustomVector3f(1.0f, 0.0f, 0.0f);
+    CustomVector3f origUpVector = new CustomVector3f(0.0f, 1.0f, 0.0f);
+    CustomVector3f origPosition = new CustomVector3f(75.5f, 90.0f, 150.0f);
 
-    Vector3 viewDir;   
-    Vector3 rightVector;    
-    Vector3 upVector;       
-    Vector3 position;   
+    CustomVector3f viewDir;   
+    CustomVector3f rightVector;    
+    CustomVector3f upVector;       
+    CustomVector3f position;   
 
     float rotatedX; 
     float rotatedY; 
@@ -39,7 +39,7 @@ public class Camera
     }
 
 
-    public void move(Vector3 direction)
+    public void move(CustomVector3f direction)
     {
         position = vectorUtils.Vector3Addition(position, direction);
     }
@@ -49,8 +49,8 @@ public class Camera
     {
         rotatedX += angle;
 
-        Vector3 temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
-        Vector3 temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
 
         viewDir = vectorUtils.Vector3Addition(temp1, temp2).getNormal();
         upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
@@ -61,8 +61,8 @@ public class Camera
     {
         rotatedY += angle;
 
-        Vector3 temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
-        Vector3 temp2 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(viewDir, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.sin(angle * PiDiv180));
 
         viewDir = vectorUtils.Vector3Substraction(temp2, temp1);
         viewDir = viewDir.getNormal();
@@ -74,8 +74,8 @@ public class Camera
     {
         rotatedZ += angle;
 
-        Vector3 temp1 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.cos(angle * PiDiv180));
-        Vector3 temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
+        CustomVector3f temp1 = vectorUtils.Vector3Multiplication(rightVector, (float)Math.cos(angle * PiDiv180));
+        CustomVector3f temp2 = vectorUtils.Vector3Multiplication(upVector, (float)Math.sin(angle * PiDiv180));
 
         rightVector = vectorUtils.Vector3Addition(temp1, temp2).getNormal();
         upVector = vectorUtils.Vector3Multiplication(vectorUtils.Vector3CrossProduct(viewDir, rightVector), -1.0f);
@@ -100,19 +100,19 @@ public class Camera
     }
 
     
-    public Vector3 getCameraPosition()
+    public CustomVector3f getCameraPosition()
     {
         return position;
     }
 
    
-    public Vector3 getCameraTarget()
+    public CustomVector3f getCameraTarget()
     {
         return vectorUtils.Vector3Addition(position, viewDir);
     }
 
    
-    public Vector3 getUpVector()
+    public CustomVector3f getUpVector()
     {
         return upVector;
     }

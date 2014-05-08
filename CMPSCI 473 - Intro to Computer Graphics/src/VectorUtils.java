@@ -4,9 +4,9 @@
     {
     }
 
-    public Vector3 Vector3Addition(Vector3 u, Vector3 v)
+    public CustomVector3f Vector3Addition(CustomVector3f u, CustomVector3f v)
     {
-        Vector3 w = new Vector3();
+        CustomVector3f w = new CustomVector3f();
 
         w.X = u.X + v.X;
         w.Y = u.Y + v.Y;
@@ -15,9 +15,9 @@
         return w;
     }
 
-    public Vector3 Vector3Substraction(Vector3 u, Vector3 v)
+    public CustomVector3f Vector3Substraction(CustomVector3f u, CustomVector3f v)
     {
-        Vector3 w = new Vector3();
+        CustomVector3f w = new CustomVector3f();
 
         w.X = v.X - u.X;
         w.Y = v.Y - u.Y;
@@ -26,9 +26,9 @@
         return w;
     }
 
-    public Vector3 Vector3Multiplication(Vector3 u, float r)
+    public CustomVector3f Vector3Multiplication(CustomVector3f u, float r)
     {
-        Vector3 w = new Vector3();
+        CustomVector3f w = new CustomVector3f();
 
         w.X = u.X * r;
         w.Y = u.Y * r;
@@ -37,9 +37,9 @@
         return w;
     }
 
-    public Vector3 Vector3CrossProduct(Vector3 u, Vector3 v)
+    public CustomVector3f Vector3CrossProduct(CustomVector3f u, CustomVector3f v)
     {
-        Vector3 w = new Vector3();
+        CustomVector3f w = new CustomVector3f();
 
         w.X = u.Y * v.Z - u.Z * v.Y;
         w.Y = u.Z * v.X - u.X * v.Z;
@@ -48,7 +48,7 @@
         return w;
     }
 
-    public float Vector3DotProduct(Vector3 u, Vector3 v)
+    public float Vector3DotProduct(CustomVector3f u, CustomVector3f v)
     {
         return (v.X * u.X) + (v.Y * u.Y) + (v.Z * u.Z);
     }
