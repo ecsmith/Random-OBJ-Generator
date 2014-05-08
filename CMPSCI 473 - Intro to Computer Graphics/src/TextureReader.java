@@ -3,7 +3,9 @@ import com.sun.opengl.util.BufferUtil;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
@@ -41,9 +43,12 @@ public class TextureReader
 	}
 
 
-	private static BufferedImage readImage(String resourceName) throws IOException
+	private static BufferedImage readImage(String filename) throws IOException
 	{
-		return ImageIO.read(ResourceGrabber.getResourceAsStream(resourceName));
+		InputStream stream = ClassLoader.getSystemResourceAsStream(filename);
+		if (stream == null)
+			stream = new FileInputStream(filename);
+		return ImageIO.read(stream);
 	}
 
 
