@@ -14,8 +14,7 @@ public class TerrainGen {
 	private static int[][] terrain;
 	static Random rand = new Random();
 	
-	public static byte[] getRandomTerrain(int s, double roughness, int m) {
-
+	public static int[][] getRandomTerrain(int s, double roughness, int m) {
 		
 		//Checks if size is positive and a power of 2
 	    if(s <=0){
@@ -39,7 +38,58 @@ public class TerrainGen {
 		
 		generate();
 
-		return array2dto1d(terrain);
+		return terrain;
+	}
+	
+
+	
+	private static void generate() {
+		int locx, locy;
+	    int dist = ssize / 2;
+	    boolean onOdd, flux = true;
+	    double startScale = 1;
+	    double ratio = Math.pow(2, -r);
+	    double scale = max;
+	    terrain[0][0] = 50;
+	    terrain[0][ssize] = 50;
+	    terrain[ssize][0] = 50;
+	    terrain[ssize][ssize] = 50;
+	    
+	    while (dist != 0) {
+	    	if (dist <= Math.pow(2, stopAfter)) {
+	    		flux = false;
+	    	}
+			for (locx = dist; locx < psize; locx += dist) {
+				for (locy = dist; locy < psize; locy+= dist) {
+					int val = avgSquare(dist, locx, locy);
+					if (flux) {
+						val += (int) (scale * (rand.nextDouble() - .5));
+					}
+					terrain[locx][locy] = val;
+					locy += dist;
+				}
+				locx += dist;
+			}
+			
+			onOdd = false;
+			for (locx = 0; locx < psize; locx += dist) {
+			    onOdd = (!onOdd);
+				for (locy = 0; locy < psize; locy += dist) {
+					if (onOdd && locy == 0) {locy += dist;}
+					int val = avgDiamond(dist, locx, locy);
+					if (flux) {
+						val += (int) (scale * (rand.nextDouble() - .5));
+					}
+					terrain[locx][locy] = val;
+				
+					locy += dist;
+				}
+			}
+			
+			scale *= ratio;
+			dist /= 2;
+	    	
+	    }
 	}
 	
 	private static int avgDiamond(int dist, int locx, int locy) {
@@ -96,78 +146,32 @@ public class TerrainGen {
 								terrain[locx][locy-dist]) / 3);
 			}
 		} else {
+			int a = terrain[locx-dist][locy];
+			int b = terrain[locx+dist][locy];
+			int c = terrain[locx][locy-dist];
+			int d = terrain[locx][locy+dist];
+			int avg = (a+b+c+d)/4;
+			return avg;
+			/*
 			return ((terrain[locx-dist][locy] +
 					 		terrain[locx+dist][locy] +
 					 		terrain[locx][locy-dist] +
-					 		terrain[locx][locy+dist]) / 4);
+					 		terrain[locx][locy+dist]) / 4);*/
 		}
 	}
 	
 	private static int avgSquare(int dist, int locx, int locy) {
+		int a = terrain[locx-dist][locy-dist];
+	    int b = terrain[locx-dist][locy+dist];
+	    int c = terrain[locx+dist][locy-dist];
+	    int d = terrain[locx+dist][locy+dist];
+	    int avg = (a+b+c+d)/4;
+	    return avg;
+	    /*
 	    return ((terrain[locx-dist][locy-dist] +
 	    		terrain[locx-dist][locy+dist] +
 	    		terrain[locx+dist][locy-dist] +
-	    		terrain[locx+dist][locy+dist]) / 4);
-	}
-	
-	private static void generate() {
-		int locx, locy;
-	    int dist = ssize / 2;
-	    boolean onOdd, flux = true;
-	    double startScale = 1;
-	    double ratio = Math.pow(2, -r);
-	    double scale = max;
-	    terrain[0][0] = (int) (scale * (rand.nextDouble() - .5));
-	    terrain[0][ssize] = (int) (scale * (rand.nextDouble() - .5));
-	    terrain[ssize][0] = (int) (scale * (rand.nextDouble() - .5));
-	    terrain[ssize][ssize] = (int) (scale * (rand.nextDouble() - .5));
-	    
-	    while (dist != 0) {
-	    	if (dist <= Math.pow(2, stopAfter)) {
-	    		flux = false;
-	    	}
-			for (locy = dist; locy < ssize; locy += dist) {
-				for (locx = dist; locx < ssize; locx+= dist) {
-					int val = avgSquare(dist, locx, locy);
-					if (flux) {
-						val += (int) (scale * (rand.nextDouble() - .5));
-					}
-					terrain[locx][locy] = val;
-					locx += dist;
-				}
-				locy += dist;
-			}
-			
-			onOdd = false;
-			for (locy = 0; locy < ssize; locy += dist) {
-			    onOdd = (!onOdd);
-				for (locx = 0; locx < ssize; locx += dist) {
-					if (onOdd && locx == 0) {locx += dist;}
-					int val = avgDiamond(dist, locx, locy);
-					if (flux) {
-						val += (int) (scale * (rand.nextDouble() - .5));
-					}
-					terrain[locx][locy] = val;
-				
-					locx += dist;
-				}
-			}
-			
-			scale *= ratio;
-			dist /= 2;
-	    	
-	    }
-	}
-	
-	private static byte[] array2dto1d(int[][] t) {
-		byte[] converted = new byte[t.length * t[0].length];
-		int n = 0;
-		for (int a = 0; a < t.length; a++) {
-			for (int b = 0; b < t[0].length; b++, n++) {
-				converted[n] = (byte) Math.abs(t[a][b]);
-			}
-		}
-		return converted;
+	    		terrain[locx+dist][locy+dist]) / 4);*/
 	}
 	
 }

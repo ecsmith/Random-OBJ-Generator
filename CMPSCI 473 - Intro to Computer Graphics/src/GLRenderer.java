@@ -13,10 +13,10 @@ public class GLRenderer implements GLEventListener
 {
     private RenderType renderType;  
     private RenderType animatorType;
-    private static final int MAP_SIZE = 1024;                 
-    private static final int STEP_SIZE = 8;                     
-    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];
-    private Vector3f[] normal = new Vector3f[4 * MAP_SIZE * MAP_SIZE];
+    private static final int MAP_SIZE = 256;                 
+    private static final int STEP_SIZE = 1;                     
+    private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
+    private Vector3f[] normal = new Vector3f[MAP_SIZE * MAP_SIZE];
     private float scaleValue = 0.10f;                          
     private float HEIGHT_RATIO = 1.0f;                          
     private float skyMovCounter = 0.0f;                       
@@ -75,7 +75,7 @@ public class GLRenderer implements GLEventListener
         setTexture();  
 
         setLightning(gl);
-        calcNorms(gl, heightMap);
+       // calcNorms(gl, heightMap);
 
         quadric = glu.gluNewQuadric();                 
         glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH); 
@@ -85,7 +85,7 @@ public class GLRenderer implements GLEventListener
 
     public void loadFile(String filename)
     {
-    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .5, 600);
+    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, 1, 600);
        //try { loadRawFile(filename, heightMap); }
        //catch (IOException e) { throw new RuntimeException(e); }
     }
@@ -151,7 +151,7 @@ public class GLRenderer implements GLEventListener
     }
 
 
-    private void calcNorms(GL gl, byte[] pHeightMap) 
+    private void calcNorms(GL gl, int[][] pHeightMap) 
     {
 
         for (int i = 0; i < normal.length; i++) {
@@ -161,10 +161,10 @@ public class GLRenderer implements GLEventListener
         int i = 0;
         for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
             for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
-            	Vector3f a = new Vector3f(X, height(pHeightMap, X, Y), Y);
-            	Vector3f b = new Vector3f(X + STEP_SIZE, height(pHeightMap, X + STEP_SIZE, Y), Y);
-            	Vector3f c = new Vector3f(X, height(pHeightMap, X, Y + STEP_SIZE), Y + STEP_SIZE);
-            	Vector3f d = new Vector3f(X + STEP_SIZE, height(pHeightMap, X + STEP_SIZE, Y + STEP_SIZE), Y + STEP_SIZE);
+            	Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
+            	Vector3f b = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y], Y);
+            	Vector3f c = new Vector3f(X, pHeightMap[X][Y + STEP_SIZE], Y + STEP_SIZE);
+            	Vector3f d = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y + STEP_SIZE], Y + STEP_SIZE);
             	
             	
             	Vector3f n1 = new Vector3f();
@@ -199,7 +199,7 @@ public class GLRenderer implements GLEventListener
  
     }
     
-    private void renderHeightMap(GL gl, byte[] pHeightMap) 
+    private void renderHeightMap(GL gl, int[][] pHeightMap) 
     {
         if(renderType == RenderType.LINE)
             gl.glBegin(GL.GL_LINES);
@@ -207,11 +207,11 @@ public class GLRenderer implements GLEventListener
             gl.glBegin(GL.GL_TRIANGLES);
 
         int n = 0;
-        for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
-            for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, n += 4) 
+        for (int X = 0; X < (MAP_SIZE); X += 1)
+            for (int Y = 0; Y < (MAP_SIZE); Y += 1, n += 4) 
             {
                 int ax = X;
-                int ay = height(pHeightMap, X, Y);
+                int ay = pHeightMap[X][Y];
                 int az = Y;
                 if(renderType == RenderType.TEXTURED)
                     gl.glTexCoord2f((float)ax / (float)MAP_SIZE, (float)az / (float)MAP_SIZE);  
@@ -220,8 +220,8 @@ public class GLRenderer implements GLEventListener
                 gl.glVertex3i(ax, ay, az);
                 
                 int bx = X;
-                int by = height(pHeightMap, X, Y + STEP_SIZE);
-                int bz = Y + STEP_SIZE;
+                int by = pHeightMap[X][Y + 1];
+                int bz = Y + 1;
                 if(renderType == RenderType.TEXTURED)
                     gl.glTexCoord2f((float)bx / (float)MAP_SIZE, (float)(bz + 1) / (float)MAP_SIZE);
                 else
@@ -229,9 +229,9 @@ public class GLRenderer implements GLEventListener
                 gl.glVertex3i(bx, by, bz);
                 //gl.glNormal3f(normal[n+1].x, normal[n+1].y, normal[n+1].z);
                 
-                int cx = X + STEP_SIZE;
-                int cy = height(pHeightMap, X + STEP_SIZE, Y + STEP_SIZE);
-                int cz = Y + STEP_SIZE;
+                int cx = X + 1;
+                int cy = pHeightMap[X + 1][Y + 1];
+                int cz = Y + 1;
                 if(renderType == RenderType.TEXTURED)
                     gl.glTexCoord2f((float)(cx + 1) / (float)MAP_SIZE, (float)(cz + 1) / (float)MAP_SIZE);
                 else
@@ -241,8 +241,8 @@ public class GLRenderer implements GLEventListener
                 gl.glVertex3i(cx, cy, cz);
                 //gl.glNormal3f(normal[n+2].x, normal[n+2].y, normal[n+2].z);
                 
-                int dx = X + STEP_SIZE;
-                int dy = height(pHeightMap, X + STEP_SIZE, Y);
+                int dx = X + 1;
+                int dy = pHeightMap[X + 1][Y];
                 int dz = Y;
                 if(renderType == RenderType.TEXTURED)
                     gl.glTexCoord2f((float)(dx + 1) / (float)MAP_SIZE, (float)dz / (float)MAP_SIZE);
@@ -260,9 +260,9 @@ public class GLRenderer implements GLEventListener
         gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // reset
     }
     
-        private void setVertexColor(GL gl, byte[] pHeightMap, int x, int y) 
+        private void setVertexColor(GL gl, int[][] pHeightMap, int x, int y) 
     {
-        int height = height(pHeightMap, x, y);
+        int height = pHeightMap[x][y];
         if(renderType != RenderType.MULTICOLOR)
         {            
             float fColor = 0.1f + (height / 256.0f);
@@ -283,14 +283,6 @@ public class GLRenderer implements GLEventListener
             else
                 gl.glColor3f(0.011764f, 0.270588f, 0.945098f);
         }
-    }
-    
-    
-    private int height(byte[] pHeightMap, int X, int Y) 
-    { 
-        int x = X % MAP_SIZE; 
-        int y = Y % MAP_SIZE;
-        return pHeightMap[x + (y * MAP_SIZE)] & 0xFF; 
     }
 
     private void loadRawFile(String strName, byte[] pHeightMap) throws IOException
