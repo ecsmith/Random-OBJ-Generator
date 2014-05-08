@@ -148,7 +148,8 @@ public class GLRenderer implements GLEventListener {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				if(normType == NormalType.NORMALS)gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
+				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
+				else gl.glNormal3f(0, 1, 0);
 
 				x = X;
 				y = pHeightMap[X][Y + 1];
@@ -160,7 +161,8 @@ public class GLRenderer implements GLEventListener {
 				}
 				gl.glVertex3i(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X][Y+1].x, normal[X][Y+1].y, normal[X][Y+1].z);
-
+				else gl.glNormal3f(0, 1, 0);
+				
 				x = X + 1;
 				y = pHeightMap[X + 1][Y + 1];
 				z = Y + 1;
@@ -171,6 +173,7 @@ public class GLRenderer implements GLEventListener {
 				}
 				gl.glVertex3i(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y+1].x, normal[X+1][Y+1].y, normal[X+1][Y+1].z);
+				else gl.glNormal3f(0, 1, 0);
 
 				x = X + 1;
 				y = pHeightMap[X + 1][Y];
@@ -182,6 +185,7 @@ public class GLRenderer implements GLEventListener {
 				}
 				gl.glVertex3i(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y].x, normal[X+1][Y].y, normal[X+1][Y].z);
+				else gl.glNormal3f(0, 1, 0);
 			}
 		}
 
