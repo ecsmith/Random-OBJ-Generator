@@ -82,7 +82,13 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		this.repainter = new ThreadHeightmap(heightmapCanvas);
 		this.repainter.setPriority(Thread.MIN_PRIORITY);
 		this.repainter.start();
-		JOptionPane.showMessageDialog(this, "Use WASD to move back, forth, and sideways.\nUse the mouse or arrow keys to change camera direction.\nQ and E move up and down.\nZ and X rotate around the Z axis.\nPress 1 to switch to wireframe, and 2 to switch back to shading.\nPress 3/4 to toggle animation, and 5/6 to toggle surface normals");
+		JOptionPane.showMessageDialog(this, "Use WASD to move back, forth, and sideways.\n" +
+											"Use the mouse or arrow keys to change camera direction.\n" +
+											"Q and E move up and down.\n" +
+											"Z and X rotate around the Z axis.\n" +
+											"Press 1 to toggle wireframe/textured.\n" +
+											"Press 2 to toggle animation, and 3 to toggle surface normals.\n" +
+											"Press 4 to generate a new random terrain.");
 
 	}
 

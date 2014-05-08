@@ -359,7 +359,7 @@ public class GLRenderer implements GLEventListener {
 	}
 	
 	public void newHeightmap() {
-		heightMap = TerrainGen.getRandomTerrain(terrainSize, 1, 100);
+		heightMap = TerrainGen.getRandomTerrain(terrainSize, .9, 100);
 		calcNorms(_gl, heightMap);
 	}
 
