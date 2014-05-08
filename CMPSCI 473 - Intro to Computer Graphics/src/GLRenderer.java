@@ -307,16 +307,36 @@ public class GLRenderer implements GLEventListener {
 				Vector3f cd = new Vector3f();
 				ca.sub(c, d);
 				n2.cross(bd, cd);
+				
+				Vector3f n3 = new Vector3f();
+				Vector3f dc = new Vector3f();
+				ba.sub(d, c);
+				Vector3f ac = new Vector3f();
+				ca.sub(a, c);
+				n3.cross(dc, ac);
+				
+				Vector3f n4 = new Vector3f();
+				Vector3f db = new Vector3f();
+				ba.sub(d, b);
+				Vector3f ab = new Vector3f();
+				ca.sub(a, b);
+				n2.cross(db, ab);
 
 				normal[X][Y].add(new Vector3f(n1));
+				normal[X][Y].add(new Vector3f(n3));
+				normal[X][Y].add(new Vector3f(n4));
 
 				normal[X+1][Y].add(new Vector3f(n1));
 				normal[X+1][Y].add(new Vector3f(n2));
+				normal[X+1][Y].add(new Vector3f(n4));
 
 				normal[X][Y+1].add(new Vector3f(n1));
 				normal[X][Y+1].add(new Vector3f(n2));
+				normal[X][Y+1].add(new Vector3f(n3));
 
 				normal[X+1][Y+1].add(new Vector3f(n2));
+				normal[X+1][Y+1].add(new Vector3f(n3));
+				normal[X+1][Y+1].add(new Vector3f(n4));
 
 			}
 		}
