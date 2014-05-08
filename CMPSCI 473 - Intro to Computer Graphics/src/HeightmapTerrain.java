@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.ImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -28,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
 
 
 public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotionListener {
@@ -134,6 +136,8 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 					file = new File(System.getProperty("user.dir"));
 					JFileChooser fc = new JFileChooser("");
 					fc.setCurrentDirectory(file);
+					fc.setAcceptAllFileFilterUsed(false);
+					fc.addChoosableFileFilter(new imgFilter());
 					int returnVal = fc.showOpenDialog(null);
 
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -306,5 +310,37 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		} else {
 			ignoreRobotMove = false;
 		}
+	}
+		
+		public static class imgFilter extends FileFilter {
+			
+		public boolean accept(File f) {
+	        if (f.isDirectory()) {
+	            return true;
+	        }
+	 
+	        String ename = f.getName();
+	        int i = ename.lastIndexOf(".");
+	        if (i > 0 && i < ename.length() - 1)
+	        	ename = ename.substring(i+1).toLowerCase();
+	        
+	        if (ename != null) {
+	            if (ename.equals("gif") ||
+	                ename.equals("jpeg") ||
+	                ename.equals("jpg") ||
+	                ename.equals("png")) {
+	                    return true;
+	            } else {
+	                return false;
+	            }
+	        }
+	 
+	        return false;
+		}
+
+		public String getDescription() {
+			return "Only images";
+		}
+		
 	}
 }

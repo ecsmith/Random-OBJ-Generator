@@ -12,9 +12,9 @@ public class GLRenderer implements GLEventListener {
 	private NormalType normType;
 	private AnimationType animType;
 	private RenderType renderType;
-	private static final int MAP_SIZE = 256;
-	private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
-	private Vector3f[][] normal = new Vector3f[MAP_SIZE][MAP_SIZE];
+	private static final int terrainSize = 256;
+	private int[][] heightMap = new int[terrainSize][terrainSize];
+	private Vector3f[][] normal = new Vector3f[terrainSize][terrainSize];
 	private float scaleValue = 0.10f;
 	private float HEIGHT_RATIO = 1.0f;
 	private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};
@@ -62,7 +62,7 @@ public class GLRenderer implements GLEventListener {
 
 		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
-		heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .9, 600);
+		heightMap = TerrainGen.getRandomTerrain(terrainSize, .8, 100);
 
 		setTexture();
 		calcNorms(gl, heightMap);
@@ -137,13 +137,13 @@ public class GLRenderer implements GLEventListener {
 		}
 
 
-		for (int X = 0; X < (MAP_SIZE-1); X += 1) {
-			for (int Y = 0; Y < (MAP_SIZE-1); Y += 1) {
+		for (int X = 0; X < (terrainSize-1); X += 1) {
+			for (int Y = 0; Y < (terrainSize-1); Y += 1) {
 				int x = X;
 				int y = pHeightMap[X][Y];
 				int z = Y;
 				if(renderType == RenderType.TEXTURED) {
-					gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);
+					gl.glTexCoord2f((float)x / (float)terrainSize, (float)z / (float)terrainSize);
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
@@ -155,7 +155,7 @@ public class GLRenderer implements GLEventListener {
 				y = pHeightMap[X][Y + 1];
 				z = Y + 1;
 				if(renderType == RenderType.TEXTURED) {
-					gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
+					gl.glTexCoord2f((float)x / (float)terrainSize, (float)(z + 1) / (float)terrainSize);
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
@@ -167,7 +167,7 @@ public class GLRenderer implements GLEventListener {
 				y = pHeightMap[X + 1][Y + 1];
 				z = Y + 1;
 				if(renderType == RenderType.TEXTURED) {
-					gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
+					gl.glTexCoord2f((float)(x + 1) / (float)terrainSize, (float)(z + 1) / (float)terrainSize);
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
@@ -179,7 +179,7 @@ public class GLRenderer implements GLEventListener {
 				y = pHeightMap[X + 1][Y];
 				z = Y;
 				if(renderType == RenderType.TEXTURED) {
-					gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);
+					gl.glTexCoord2f((float)(x + 1) / (float)terrainSize, (float)z / (float)terrainSize);
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
@@ -260,7 +260,7 @@ public class GLRenderer implements GLEventListener {
 		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
 
 		_gl.glPushMatrix();
-		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - terrainSize * scaleValue * 0.5f);
 		double[] clipPlane1 = {0.0f, 0.0f, 0.0f, 0.0f};
 		_gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0);
 		_gl.glEnable(GL.GL_CLIP_PLANE1);
@@ -268,7 +268,7 @@ public class GLRenderer implements GLEventListener {
 		_gl.glDisable(GL.GL_CLIP_PLANE1);
 		_gl.glPopMatrix();
 		_gl.glPushMatrix();
-		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - terrainSize * scaleValue * 0.5f);
 		double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
 		_gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0);
 		_gl.glEnable(GL.GL_CLIP_PLANE2);
@@ -280,14 +280,14 @@ public class GLRenderer implements GLEventListener {
 
 	private void calcNorms(GL gl, int[][] pHeightMap)
 	{
-		for (int x = 0; x < MAP_SIZE; x++) {
-			for (int y = 0; y < MAP_SIZE; y++) {
+		for (int x = 0; x < terrainSize; x++) {
+			for (int y = 0; y < terrainSize; y++) {
 				normal[x][y] = new Vector3f(0,0,0);
 			}
 		}
 
-		for (int X = 0; X < MAP_SIZE-1; X ++) {
-			for (int Y = 0; Y < MAP_SIZE-1; Y ++) {
+		for (int X = 0; X < terrainSize-1; X ++) {
+			for (int Y = 0; Y < terrainSize-1; Y ++) {
 				Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
 				Vector3f b = new Vector3f(X + 1, pHeightMap[X + 1][Y], Y);
 				Vector3f c = new Vector3f(X, pHeightMap[X][Y + 1], Y + 1);
