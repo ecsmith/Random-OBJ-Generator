@@ -287,7 +287,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
         	break;
         case (KeyEvent.VK_COMMA):
         case (KeyEvent.VK_S):         
-            renderer.camera.moveForward(-1.0f);
+            renderer.camera.moveForward(1.0f);
         	break;
         case (KeyEvent.VK_SEMICOLON):
         case (KeyEvent.VK_A):
@@ -295,7 +295,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
         	break;
         case (KeyEvent.VK_PERIOD):
         case (KeyEvent.VK_W): 
-            renderer.camera.moveForward(2.0f);
+            renderer.camera.moveForward(-2.0f);
         	break;
         case (KeyEvent.VK_QUOTE):
         case (KeyEvent.VK_D): 
@@ -356,8 +356,8 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 	public void mouseMoved(MouseEvent e) {
 		if (!ignoreRobotMove) {
 			
-			int dx = MouseInfo.getPointerInfo().getLocation().x - (canvaswidth/2);
-			int dy = MouseInfo.getPointerInfo().getLocation().y - (canvasheight/2);
+			int dx = MouseInfo.getPointerInfo().getLocation().x - (this.getX() + canvaswidth/2);
+			int dy = MouseInfo.getPointerInfo().getLocation().y - (this.getY() + canvasheight/2);
 			if(dx != 0) {     
 				float yrot = -(float)dx/100;
 	            renderer.camera.rotateY(yrot);
@@ -368,7 +368,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 	            renderer.camera.rotateX(xrot);
 	        }
 	        
-	        robot.mouseMove(canvaswidth/2, canvasheight/2);
+	        robot.mouseMove(this.getX() + canvaswidth/2, this.getY() + canvasheight/2);
 	        ignoreRobotMove = true;
 		} else {
 			ignoreRobotMove = false;

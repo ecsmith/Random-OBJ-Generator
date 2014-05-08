@@ -36,7 +36,7 @@ public class TextureReader
 	}
 
 	public static Texture readTexture(BufferedImage bufferedImage) {
-		return readPixels(bufferedImage, false, false);
+		return readPixels(bufferedImage, true, false);
 	}
 
 	public static Texture readTexture(BufferedImage bufferedImage, boolean storeAlphaChannel) {
