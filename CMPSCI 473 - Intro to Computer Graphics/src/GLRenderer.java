@@ -1,10 +1,10 @@
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.GLUT;
@@ -322,7 +322,56 @@ public class GLRenderer implements GLEventListener
         _gl.glPopMatrix();  
 
     }
-    
+    private void calcNorms(GL gl, int[][] pHeightMap)
+	{
+//		normal[0][0] = new CustomVector3f();
+		/*
+		for (int i = 0; i < normal.length; i++) {
+			normal[i] = new Vector3f(0,0,0);
+		}
+
+		int i = 0;
+		for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE) {
+			for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
+				Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
+				Vector3f b = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y], Y);
+				Vector3f c = new Vector3f(X, pHeightMap[X][Y + STEP_SIZE], Y + STEP_SIZE);
+				Vector3f d = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y + STEP_SIZE], Y + STEP_SIZE);
+
+
+				Vector3f n1 = new Vector3f();
+				Vector3f ba = new Vector3f();
+				ba.sub(b, a);
+				Vector3f ca = new Vector3f();
+				ca.sub(c, a);
+				n1.cross(ba, ca);
+
+				Vector3f n2 = new Vector3f();
+				Vector3f bd = new Vector3f();
+				ba.sub(b, d);
+				Vector3f cd = new Vector3f();
+				ca.sub(c, d);
+				n2.cross(bd, cd);
+
+				normal[i].add(new Vector3f(n1));
+
+				normal[i+1].add(new Vector3f(n1));
+				normal[i+1].add(new Vector3f(n2));
+
+				normal[i+2].add(new Vector3f(n1));
+				normal[i+2].add(new Vector3f(n2));
+
+				normal[i+3].add(new Vector3f(n2));
+
+			}
+		}
+
+		for (Vector3f n : normal) {
+			n.normalize();
+		}
+		 */
+
+	}
     private void animateColors()
     {
         _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
@@ -341,48 +390,49 @@ public class GLRenderer implements GLEventListener
         _gl.glPopMatrix();  
     }
 
-    private void setTexture()
-    {
-        textures = new int[1];
+    
+	private void setTexture()
+	{
+		textures = new int[1];
 
-        _gl.glEnable(GL.GL_TEXTURE_2D);
+		_gl.glEnable(GL.GL_TEXTURE_2D);
 
-        TextureReader.Texture texture;
+		TextureReader.Texture texture;
 
-        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
+		try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e); }
 
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
 
-    }
+	}
 
-    public RenderType getRenderType()
-    {
-        return renderType;
-    }
+	public RenderType getRenderType()
+	{
+		return renderType;
+	}
 
-    public void setRenderType(RenderType renderType)
-    {
-        this.renderType = renderType;
-    }
+	public void setRenderType(RenderType renderType)
+	{
+		this.renderType = renderType;
+	}
 
-    public float getScaleValue()
-    {
-        return scaleValue;
-    }
+	public float getScaleValue()
+	{
+		return scaleValue;
+	}
 
-    public void setScaleValue(float scaleValue) 
-    {
-        if(scaleValue < 0.1f || scaleValue > 0.4f)
-            return;
+	public void setScaleValue(float scaleValue)
+	{
+		if(scaleValue < 0.1f || scaleValue > 0.4f) {
+			return;
+		}
 
-        this.scaleValue = scaleValue;
-    }
-
+		this.scaleValue = scaleValue;
+	}
 
 }
