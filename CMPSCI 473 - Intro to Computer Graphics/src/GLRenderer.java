@@ -13,12 +13,12 @@ public class GLRenderer implements GLEventListener {
 	private AnimationType animType;
 	private RenderType renderType;
 	private static final int terrainSize = 256;
-	private int[][] heightMap = new int[terrainSize][terrainSize];
+	private double[][] heightMap;;
 	private Vector3f[][] normal = new Vector3f[terrainSize][terrainSize];
 	private float scaleValue = 0.10f;
 	private float HEIGHT_RATIO = 1.0f;
-	private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};
-	private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};
+	private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 1.0f};
+	private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
 	private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f};
 	private int[] textures = new int[1];
 	private int skyTexture;
@@ -62,10 +62,9 @@ public class GLRenderer implements GLEventListener {
 
 		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
-		heightMap = TerrainGen.getRandomTerrain(terrainSize, .8, 100);
+		newHeightmap();
 
 		setTexture();
-		calcNorms(gl, heightMap);
 		setLightning(gl);
 		loadSphereTexture();
 		camera.move(new CustomVector3f(-60, -55, -70));
@@ -121,6 +120,16 @@ public class GLRenderer implements GLEventListener {
 
 		drawSphere();
 		if(animType == AnimationType.ANIMATED) animateColors();
+		else {
+			TextureReader.Texture tex = null;
+			try {
+				tex = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			makeRGBTexture(gl, glu, tex, GL.GL_TEXTURE_2D);
+		}
 		gl.glFlush();
 	}
 
@@ -129,7 +138,7 @@ public class GLRenderer implements GLEventListener {
 
 
 
-	private void renderHeightMap(GL gl, int[][] pHeightMap) {
+	private void renderHeightMap(GL gl, double[][] pHeightMap) {
 		if(renderType == RenderType.LINE) {
 			gl.glBegin(GL.GL_LINES);
 		} else {
@@ -140,14 +149,15 @@ public class GLRenderer implements GLEventListener {
 		for (int X = 0; X < (terrainSize-1); X += 1) {
 			for (int Y = 0; Y < (terrainSize-1); Y += 1) {
 				int x = X;
-				int y = pHeightMap[X][Y];
+				double y = pHeightMap[X][Y];
 				int z = Y;
 				if(renderType == RenderType.TEXTURED) {
 					gl.glTexCoord2f((float)x / (float)terrainSize, (float)z / (float)terrainSize);
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
-				gl.glVertex3i(x, y, z);
+				
+				gl.glVertex3d(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
 				else gl.glNormal3f(0, 1, 0);
 
@@ -159,7 +169,7 @@ public class GLRenderer implements GLEventListener {
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
-				gl.glVertex3i(x, y, z);
+				gl.glVertex3d(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X][Y+1].x, normal[X][Y+1].y, normal[X][Y+1].z);
 				else gl.glNormal3f(0, 1, 0);
 				
@@ -171,7 +181,7 @@ public class GLRenderer implements GLEventListener {
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
-				gl.glVertex3i(x, y, z);
+				gl.glVertex3d(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y+1].x, normal[X+1][Y+1].y, normal[X+1][Y+1].z);
 				else gl.glNormal3f(0, 1, 0);
 
@@ -183,7 +193,7 @@ public class GLRenderer implements GLEventListener {
 				} else {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
-				gl.glVertex3i(x, y, z);
+				gl.glVertex3d(x, y, z);
 				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y].x, normal[X+1][Y].y, normal[X+1][Y].z);
 				else gl.glNormal3f(0, 1, 0);
 			}
@@ -193,12 +203,12 @@ public class GLRenderer implements GLEventListener {
 		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // reset
 	}
 
-	private void setVertexColor(GL gl, int[][] pHeightMap, int x, int y)
+	private void setVertexColor(GL gl, double[][] pHeightMap, int x, int y)
 	{
-		int height = pHeightMap[x][y];
+		double height = pHeightMap[x][y];
 		if(renderType != RenderType.MULTICOLOR)
 		{
-			float fColor = 0.1f + (height / 256.0f);
+			float fColor = (float) (0.1f + (height / 256.0f));
 			gl.glColor3f(0, 0, fColor);
 		}
 		else
@@ -219,7 +229,7 @@ public class GLRenderer implements GLEventListener {
 		}
 	}
 
-	private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
+	private void makeRGBTexture(GL gl, GLU glu, TextureReader.Texture img, int target)
 	{
 
 		gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
@@ -278,7 +288,7 @@ public class GLRenderer implements GLEventListener {
 
 	}
 
-	private void calcNorms(GL gl, int[][] pHeightMap)
+	private void calcNorms(GL gl, double[][] pHeightMap)
 	{
 		for (int x = 0; x < terrainSize; x++) {
 			for (int y = 0; y < terrainSize; y++) {
@@ -288,10 +298,10 @@ public class GLRenderer implements GLEventListener {
 
 		for (int X = 0; X < terrainSize-1; X ++) {
 			for (int Y = 0; Y < terrainSize-1; Y ++) {
-				Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
-				Vector3f b = new Vector3f(X + 1, pHeightMap[X + 1][Y], Y);
-				Vector3f c = new Vector3f(X, pHeightMap[X][Y + 1], Y + 1);
-				Vector3f d = new Vector3f(X + 1, pHeightMap[X + 1][Y + 1], Y + 1);
+				Vector3f a = new Vector3f(X, (float) pHeightMap[X][Y], Y);
+				Vector3f b = new Vector3f(X + 1, (float) pHeightMap[X + 1][Y], Y);
+				Vector3f c = new Vector3f(X, (float) pHeightMap[X][Y + 1], Y + 1);
+				Vector3f d = new Vector3f(X + 1, (float) pHeightMap[X + 1][Y + 1], Y + 1);
 
 
 				Vector3f n1 = new Vector3f();
@@ -346,6 +356,11 @@ public class GLRenderer implements GLEventListener {
 				l2.normalize();
 			}
 		}
+	}
+	
+	public void newHeightmap() {
+		heightMap = TerrainGen.getRandomTerrain(terrainSize, 1, 100);
+		calcNorms(_gl, heightMap);
 	}
 
 	private void animateColors()

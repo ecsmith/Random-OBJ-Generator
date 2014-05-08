@@ -40,6 +40,9 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 	private static byte[] input_bytes = null;
 	private static Robot robot;
 	private static int canvasheight, canvaswidth;
+	private boolean drawTex = true;
+	private boolean renderAnim = true;
+	private boolean useNormals = true;
 
 	public ThreadHeightmap repainter;
 
@@ -252,22 +255,31 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 			renderer.setScaleValue(scale - 0.01f);
 		break;
 		case (KeyEvent.VK_1):
-			renderer.setRenderType(RenderType.LINE);
+			if (drawTex) {
+				renderer.setRenderType(RenderType.LINE);	
+			} else {
+				renderer.setRenderType(RenderType.TEXTURED);
+			}
+			drawTex = !drawTex;	
 		break;
 		case (KeyEvent.VK_2):
-			renderer.setRenderType(RenderType.TEXTURED);
+			if (renderAnim) {
+				renderer.setAnimationType(AnimationType.NONE);
+			} else {
+				renderer.setAnimationType(AnimationType.ANIMATED);
+			}
+			renderAnim = !renderAnim;	
 		break;
 		case (KeyEvent.VK_3):
-			renderer.setAnimationType(AnimationType.NONE);
+			if (useNormals) {
+				renderer.setNormalType(NormalType.NONE);	
+			} else {
+				renderer.setNormalType(NormalType.NORMALS);
+			}
+			useNormals = !useNormals;
 		break;
 		case (KeyEvent.VK_4):
-			renderer.setAnimationType(AnimationType.ANIMATED);
-		break;
-		case (KeyEvent.VK_5):
-			renderer.setNormalType(NormalType.NONE);
-		break;
-		case (KeyEvent.VK_6):
-			renderer.setNormalType(NormalType.NORMALS);
+			renderer.newHeightmap();
 		break;
 		case (KeyEvent.VK_ESCAPE):
 			System.exit(0);

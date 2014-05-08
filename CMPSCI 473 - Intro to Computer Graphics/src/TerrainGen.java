@@ -8,10 +8,10 @@ public class TerrainGen {
 	private static int max;
 	private static int stopAfter;
 	static double r;
-	private static int[][] terrain;
+	private static double[][] terrain;
 	static Random rand = new Random();
 
-	public static int[][] getRandomTerrain(int s, double roughness, int m) {
+	public static double[][] getRandomTerrain(int s, double roughness, int m) {
 
 		//Checks if size is positive and a power of 2
 		if(s <=0){
@@ -29,7 +29,7 @@ public class TerrainGen {
 		r = roughness;
 
 		max = m;
-		terrain = new int[psize][psize];
+		terrain = new double[psize][psize];
 
 		generate();
 
@@ -44,17 +44,17 @@ public class TerrainGen {
 		boolean onOdd;
 		double ratio = Math.pow(2, -r);
 		double scale = max;
-		terrain[0][0] = (int) (scale * (rand.nextDouble() - .5));
-		terrain[0][ssize] = (int) (scale * (rand.nextDouble() - .5));
-		terrain[ssize][0] = (int) (scale * (rand.nextDouble() - .5));
-		terrain[ssize][ssize] = (int) (scale * (rand.nextDouble() - .5));
+		terrain[0][0] = (scale * (rand.nextDouble() - .5));
+		terrain[0][ssize] = (scale * (rand.nextDouble() - .5));
+		terrain[ssize][0] = (scale * (rand.nextDouble() - .5));
+		terrain[ssize][ssize] = (scale * (rand.nextDouble() - .5));
 
 		while (dist != 0) {
 			if (dist <= Math.pow(2, stopAfter)) {
 			}
 			for (locx = dist; locx < psize; locx += dist) {
 				for (locy = dist; locy < psize; locy+= dist) {
-					terrain[locx][locy] = avgSquare(dist, locx, locy) + (int) (scale * (rand.nextDouble() - .5));
+					terrain[locx][locy] = avgSquare(dist, locx, locy) + (scale * (rand.nextDouble() - .5));
 					locy += dist;
 				}
 				locx += dist;
@@ -65,7 +65,7 @@ public class TerrainGen {
 				onOdd = (!onOdd);
 				for (locy = 0; locy < psize; locy += dist) {
 					if (onOdd && locy == 0) {locy += dist;}
-					terrain[locx][locy] = avgDiamond(dist, locx, locy) + (int) (scale * (rand.nextDouble() - .5));;
+					terrain[locx][locy] = avgDiamond(dist, locx, locy) + (scale * (rand.nextDouble() - .5));;
 					locy += dist;
 				}
 			}
@@ -76,7 +76,7 @@ public class TerrainGen {
 		}
 	}
 
-	private static int avgDiamond(int dist, int locx, int locy) {
+	private static double avgDiamond(int dist, int locx, int locy) {
 		if (locx == 0) {
 			if (locy == 0) {
 				return (terrain[dist][locy] +
@@ -137,7 +137,7 @@ public class TerrainGen {
 		}
 	}
 
-	private static int avgSquare(int dist, int locx, int locy) {
+	private static double avgSquare(int dist, int locx, int locy) {
 	    return ((terrain[locx-dist][locy-dist] +
 	    		terrain[locx-dist][locy+dist] +
 	    		terrain[locx+dist][locy-dist] +
