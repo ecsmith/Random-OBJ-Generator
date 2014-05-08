@@ -84,7 +84,7 @@ public class GLRenderer implements GLEventListener
 
     public void loadFile(String filename)
     {
-    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, 1, 600);
+    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .5, 600);
        //try { loadRawFile(filename, heightMap); }
        //catch (IOException e) { throw new RuntimeException(e); }
     }
