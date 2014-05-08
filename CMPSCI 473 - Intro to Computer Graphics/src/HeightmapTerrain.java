@@ -148,16 +148,16 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 							input_bytes = new byte[(int)rand_file.length()];
 							rand_file.readFully(input_bytes);
 							System.out.println("Output: " + input_bytes.toString() + ".\n");
-
-
 							rand_file.close();
 
 						} catch (IOException e) {//If the file is not found
 							e.printStackTrace();  //Print trace the error
+							System.exit(0);
 						}
 
 					} else {
 						System.out.println("Open command cancelled by user.\n");
+						System.exit(0);
 					}
 
 				}
