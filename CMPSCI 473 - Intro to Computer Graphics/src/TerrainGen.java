@@ -28,7 +28,7 @@ public class TerrainGen {
 		psize = ssize + 1;
 		r = roughness;
 
-		max = 128;
+		max = m;
 		terrain = new int[psize][psize];
 
 		generate();
@@ -44,10 +44,10 @@ public class TerrainGen {
 		boolean onOdd;
 		double ratio = Math.pow(2, -r);
 		double scale = max;
-		terrain[0][0] = 50;
-		terrain[0][ssize] = 50;
-		terrain[ssize][0] = 50;
-		terrain[ssize][ssize] = 50;
+		terrain[0][0] = (int) (scale * (rand.nextDouble() - .5));
+		terrain[0][ssize] = (int) (scale * (rand.nextDouble() - .5));
+		terrain[ssize][0] = (int) (scale * (rand.nextDouble() - .5));
+		terrain[ssize][ssize] = (int) (scale * (rand.nextDouble() - .5));
 
 		while (dist != 0) {
 			if (dist <= Math.pow(2, stopAfter)) {
