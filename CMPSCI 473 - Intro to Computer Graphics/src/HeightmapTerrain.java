@@ -11,19 +11,14 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -31,7 +26,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 
@@ -107,19 +101,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setTitle("Heightmap Landscape");
 		addKeyListener(this);
-
-		heightmapCanvas.addMouseWheelListener(new MouseWheelListener() {
-			@Override
-			public void mouseWheelMoved(MouseWheelEvent evt) {
-				heightmapCanvasMouseWheelMoved(evt);
-			}
-		});
-		heightmapCanvas.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent evt) {
-				heightmapCanvasMouseClicked(evt);
-			}
-		});
 		heightmapCanvas.addMouseMotionListener(this);
 		heightmapCanvas.addKeyListener(this);
 
@@ -145,23 +126,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 
 	}
 
-	private void heightmapCanvasMouseWheelMoved(MouseWheelEvent evt) {
-
-	}
-
-	private void heightmapCanvasMouseClicked(MouseEvent evt) {
-		RenderType renderType = renderer.getRenderType();
-
-		if(renderType == RenderType.LINE) {
-			renderer.setRenderType(RenderType.SOLID);
-		} else if(renderType == RenderType.SOLID) {
-			renderer.setRenderType(RenderType.MULTICOLOR);
-		} else if(renderType == RenderType.MULTICOLOR) {
-			renderer.setRenderType(RenderType.LINE);
-		}
-	}
-
-
 	public static void main(String args[]) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
@@ -176,7 +140,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						file = fc.getSelectedFile();
 
-						//This is where a real application would open the file.
 						System.out.println("Opening: " + file.getName() + ".\n");
 						System.out.println("Size in Bytes: " + file.getFreeSpace() + ".\n");
 						try{
@@ -211,35 +174,23 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 			@Override
 			public void run() {
 
-				// switch to system l&f for native font rendering etc.
-				try{
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-				}catch(Exception ex) {
-					Logger.getLogger(getClass().getName()).log(Level.INFO, "can not enable system look and feel", ex);
-				}
-
 				HeightmapTerrain frame = new HeightmapTerrain();
 
-				//height = frame.getHeight();
-				//width = frame.getWidth();
 				frame.setVisible(true);
 				hideCursor(frame);
 				curX = canvaswidth/2;
 				curY = canvasheight/2;
-				//robot.mouseMove(width/2, height/2);
 			}
 		});
 	}
 	private GLCanvas heightmapCanvas;
 
 	private static void hideCursor(JFrame frame) {
-		//Create an empty byte array
 		byte[]imageByte=new byte[0];
 
 		Cursor emptyCursor;
 		Point myPoint=new Point(0,0);
 
-		//Create image for cursor using empty array
 		Image cursorImage=Toolkit.getDefaultToolkit().createImage(imageByte);
 		emptyCursor=Toolkit.getDefaultToolkit().createCustomCursor(cursorImage,myPoint,"cursor");
 		frame.setCursor(emptyCursor);
@@ -311,8 +262,11 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 
 	}
 
+	@Override
 	public void keyReleased(KeyEvent arg0) {}
+	@Override
 	public void keyTyped(KeyEvent arg0) {}
+	@Override
 	public void mouseDragged(MouseEvent arg0) {}
 
 	static int curX;

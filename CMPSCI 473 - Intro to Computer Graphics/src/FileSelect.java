@@ -20,7 +20,6 @@ class FileSelect
             	
                 File file = fc.getSelectedFile();
 
-                //This is where a real application would open the file.
                 System.out.println("Opening: " + file.getName() + ".\n");
                 System.out.println("Size in Bytes: " + file.getFreeSpace() + ".\n");
                 try{
