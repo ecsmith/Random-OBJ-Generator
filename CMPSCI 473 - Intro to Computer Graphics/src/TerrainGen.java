@@ -9,6 +9,7 @@ public class TerrainGen {
 	private static int psize;
 	private static int ssize;
 	private static int max;
+	private static int stopAfter;
 	static double r;
 	private static byte[][] terrain;
 	static Random rand = new Random();
@@ -30,6 +31,9 @@ public class TerrainGen {
 		ssize = s;
 		psize = ssize + 1;
         r = roughness;
+        int numDivs = (int) (Math.log(s)/Math.log(2));
+       	stopAfter = numDivs - 4;
+        
 		max = m;
 		terrain = new byte[psize][psize];
 		
@@ -45,7 +49,7 @@ public class TerrainGen {
 								terrain[locx][dist]) / 2);
 			} else if (locy == ssize) {
 				return (byte) ((terrain[dist][locy] + 
-								terrain[locx][ssize-dist]) / 2);
+								terrain[locx][locy-dist]) / 2);
 			} else {
 				return (byte) ((terrain[0][locy-dist] + 
 								terrain[0][locy+dist] + 
@@ -78,7 +82,7 @@ public class TerrainGen {
 		} else if (locy == ssize) {
 			if (locx == 0) {
 				return (byte) ((terrain[dist][locy] + 
-								terrain[locx][ssize-dist]) / 2);
+								terrain[locx][locy-dist]) / 2);
 			} else if (locx == ssize) {
 				return (byte) ((terrain[locx-dist][locy] + 
 								terrain[locx][locy-dist]) / 2);
@@ -105,34 +109,45 @@ public class TerrainGen {
 	private static void generate() {
 		int locx, locy;
 	    int dist = ssize / 2;
-	    boolean onOdd;
+	    boolean onOdd, flux = true;
 	    double startScale = 1;
 	    double ratio = Math.pow(2, -r);
-	    double scale = max;
+	    double scale = max * ratio;
 	    terrain[0][0] = (byte) Math.abs((scale * (rand.nextDouble() - .5)));
 	    terrain[0][ssize] = (byte) Math.abs((scale * (rand.nextDouble() - .5)));
 	    terrain[ssize][0] = (byte) Math.abs((scale * (rand.nextDouble() - .5)));
 	    terrain[ssize][ssize] = (byte) Math.abs((scale * (rand.nextDouble() - .5)));
 	    
 	    while (dist != 0) {
-			for (locx = dist; locx < psize; locx += dist) {
-				for (locy = dist; locy < psize; locy+= dist) {
-					byte val = (byte) Math.abs((scale * (rand.nextDouble() - .5) + avgSquare(dist, locx, locy)));
+	    	if (dist <= Math.pow(2, stopAfter)) {
+	    		flux = false;
+	    	}
+			for (locy = dist; locy < ssize; locy += dist) {
+				for (locx = dist; locx < ssize; locx+= dist) {
+					byte val = (byte) Math.abs(avgSquare(dist, locx, locy));
+					if (flux) {
+						val += (byte) (scale * (rand.nextDouble() - .5));
+					}
+					if (val > max) { val = (byte) max; }
 					terrain[locx][locy] = val;
-					locy += dist;
+					locx += dist;
 				}
-				locx += dist;
+				locy += dist;
 			}
 			
 			onOdd = false;
-			for (locx = 0; locx < psize; locx += dist) {
+			for (locy = 0; locy < ssize; locy += dist) {
 			    onOdd = (!onOdd);
-				for (locy = 0; locy < psize; locy += dist) {
-					if (onOdd && locy == 0) {locy += dist;}
-					byte val = (byte) Math.abs((scale * (rand.nextDouble() - .5) + avgDiamond(dist, locx, locy)));
+				for (locx = 0; locx < ssize; locx += dist) {
+					if (onOdd && locx == 0) {locx += dist;}
+					byte val = (byte) Math.abs(avgDiamond(dist, locx, locy));
+					if (flux) {
+						val += (byte) (scale * (rand.nextDouble() - .5));
+					}
+					if (val > max) { val = (byte) max; }
 					terrain[locx][locy] = val;
 				
-					locy += dist;
+					locx += dist;
 				}
 			}
 			
