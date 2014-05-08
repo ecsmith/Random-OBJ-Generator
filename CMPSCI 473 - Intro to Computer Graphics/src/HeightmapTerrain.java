@@ -15,7 +15,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.ImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -103,8 +102,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		}
 	}
 
-
-	@SuppressWarnings("unchecked")
 	private void initComponents() {
 
 		heightmapCanvas = new GLCanvas();
