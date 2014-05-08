@@ -16,12 +16,11 @@ public class GLRenderer implements GLEventListener {
 	private double[][] heightMap;;
 	private Vector3f[][] normal = new Vector3f[terrainSize][terrainSize];
 	private float scaleValue = 0.10f;
-	private float HEIGHT_RATIO = 1.0f;
+	private float heightRatio = 1.0f;
 	private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 1.0f};
 	private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 1.0f};
 	private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f};
-	private int[] textures = new int[1];
-	private int skyTexture;
+	private int texval = 0;
 	private GLU glu = new GLU();
 	private GLUT glut;
 	private GL _gl;
@@ -65,8 +64,7 @@ public class GLRenderer implements GLEventListener {
 		newHeightmap();
 
 		setTexture();
-		setLightning(gl);
-		loadSphereTexture();
+		setLighting(gl);
 		camera.move(new CustomVector3f(-60, -55, -70));
 
 	}
@@ -109,9 +107,9 @@ public class GLRenderer implements GLEventListener {
 				upVector.Z);
 
 
-		gl.glScalef(scaleValue, scaleValue * HEIGHT_RATIO, scaleValue);    // scaling
-		setLightning(gl);
-		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		gl.glScalef(scaleValue, scaleValue * heightRatio, scaleValue);    // scaling
+		setLighting(gl);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, texval);
 		gl.glEnable(GL.GL_LIGHT0);
 		gl.glEnable(GL.GL_LIGHTING);
 		renderHeightMap(gl, heightMap);
@@ -237,7 +235,7 @@ public class GLRenderer implements GLEventListener {
 
 	}
 
-	private void setLightning(GL gl)
+	private void setLighting(GL gl)
 	{
 		gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
 		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, this.lightDiffuse, 0);
@@ -246,28 +244,9 @@ public class GLRenderer implements GLEventListener {
 		gl.glEnable(GL.GL_LIGHTING);
 	}
 
-	private void loadSphereTexture()
-	{
-		String textureName = "sky.png";
-
-		TextureReader.Texture texture;
-		try { texture = TextureReader.readTexture(textureName); }
-		catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e); }
-
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-		glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, GL.GL_RGB8, texture.getWidth(),
-				texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
-	}
-
-
 	private void drawSphere()
 	{
 		CustomVector3f camPosition = camera.getCameraPosition();
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
 
 		_gl.glPushMatrix();
 		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - terrainSize * scaleValue * 0.5f);
@@ -365,7 +344,7 @@ public class GLRenderer implements GLEventListener {
 
 	private void animateColors()
 	{
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, texval);
 		_gl.glPushMatrix();
 		TextureReader.Texture texture;
 		try {
@@ -374,7 +353,7 @@ public class GLRenderer implements GLEventListener {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, texval);
 		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
 		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
@@ -384,7 +363,6 @@ public class GLRenderer implements GLEventListener {
 
 	private void setTexture()
 	{
-		textures = new int[1];
 
 		_gl.glEnable(GL.GL_TEXTURE_2D);
 
@@ -395,7 +373,7 @@ public class GLRenderer implements GLEventListener {
 			e.printStackTrace();
 			throw new RuntimeException(e); }
 
-		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, texval);
 		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
 		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
