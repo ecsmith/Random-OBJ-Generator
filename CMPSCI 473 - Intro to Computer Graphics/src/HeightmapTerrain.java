@@ -24,6 +24,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.WindowConstants;
@@ -76,9 +77,8 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		this.repainter = new ThreadHeightmap(heightmapCanvas);
 		this.repainter.setPriority(Thread.MIN_PRIORITY);
 		this.repainter.start();
+		JOptionPane.showMessageDialog(this, "Use WASD to move back, forth, and sideways.\nUse the mouse or arrow keys to change camera direction.\nQ and E move up and down.\nZ and X rotate around the Z axis.\nPress 1 to switch to wireframe, and 2 to switch back to shading.");
 
-		renderer.camera.moveForward(-50.0f);
-		renderer.camera.moveUpward(-4.0f);
 	}
 
 	@Override

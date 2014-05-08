@@ -62,6 +62,7 @@ public class GLRenderer implements GLEventListener {
 		calcNorms(gl, heightMap);
 		setLightning(gl);
 		loadSphereTexture();
+		camera.move(new CustomVector3f(-60, -55, -70));
 
 	}
 
