@@ -329,6 +329,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
             System.exit(0);
         	break;
         }
+        
 		
 	}
 
