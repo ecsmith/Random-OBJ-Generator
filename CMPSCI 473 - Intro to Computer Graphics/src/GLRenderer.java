@@ -9,6 +9,8 @@ import com.sun.opengl.util.GLUT;
 
 public class GLRenderer implements GLEventListener {
 
+	private NormalType normType;
+	private AnimationType animType;
 	private RenderType renderType;
 	private static final int MAP_SIZE = 256;
 	private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
@@ -30,11 +32,15 @@ public class GLRenderer implements GLEventListener {
 	{
 		filename = file;
 		renderType = RenderType.TEXTURED;
+		animType = AnimationType.ANIMATED;
+		normType = NormalType.NORMALS;
 	}
 
 	public GLRenderer()
 	{
 		renderType = RenderType.TEXTURED;
+		animType = AnimationType.ANIMATED;
+		normType = NormalType.NORMALS;
 	}
 
 
@@ -114,7 +120,7 @@ public class GLRenderer implements GLEventListener {
 		gl.glDisable(GL.GL_LIGHTING);
 
 		drawSphere();
-		animateColors();
+		if(animType == AnimationType.ANIMATED) animateColors();
 		gl.glFlush();
 	}
 
@@ -142,7 +148,7 @@ public class GLRenderer implements GLEventListener {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
+				if(normType == NormalType.NORMALS)gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
 
 				x = X;
 				y = pHeightMap[X][Y + 1];
@@ -153,7 +159,7 @@ public class GLRenderer implements GLEventListener {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				gl.glNormal3f(normal[X][Y+1].x, normal[X][Y+1].y, normal[X][Y+1].z);
+				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X][Y+1].x, normal[X][Y+1].y, normal[X][Y+1].z);
 
 				x = X + 1;
 				y = pHeightMap[X + 1][Y + 1];
@@ -164,7 +170,7 @@ public class GLRenderer implements GLEventListener {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				gl.glNormal3f(normal[X+1][Y+1].x, normal[X+1][Y+1].y, normal[X+1][Y+1].z);
+				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y+1].x, normal[X+1][Y+1].y, normal[X+1][Y+1].z);
 
 				x = X + 1;
 				y = pHeightMap[X + 1][Y];
@@ -175,7 +181,7 @@ public class GLRenderer implements GLEventListener {
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				gl.glNormal3f(normal[X+1][Y].x, normal[X+1][Y].y, normal[X+1][Y].z);
+				if(normType == NormalType.NORMALS) gl.glNormal3f(normal[X+1][Y].x, normal[X+1][Y].y, normal[X+1][Y].z);
 			}
 		}
 
@@ -356,7 +362,6 @@ public class GLRenderer implements GLEventListener {
 		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
 
 	}
-
 	public RenderType getRenderType()
 	{
 		return renderType;
@@ -366,7 +371,14 @@ public class GLRenderer implements GLEventListener {
 	{
 		this.renderType = renderType;
 	}
-
+	public void setAnimationType(AnimationType animType)
+	{
+		this.animType = animType;
+	}
+	public void setNormalType(NormalType normType)
+	{
+		this.normType = normType;
+	}
 	public float getScaleValue()
 	{
 		return scaleValue;

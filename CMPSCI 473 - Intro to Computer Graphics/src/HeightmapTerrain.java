@@ -77,7 +77,7 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		this.repainter = new ThreadHeightmap(heightmapCanvas);
 		this.repainter.setPriority(Thread.MIN_PRIORITY);
 		this.repainter.start();
-		JOptionPane.showMessageDialog(this, "Use WASD to move back, forth, and sideways.\nUse the mouse or arrow keys to change camera direction.\nQ and E move up and down.\nZ and X rotate around the Z axis.\nPress 1 to switch to wireframe, and 2 to switch back to shading.");
+		JOptionPane.showMessageDialog(this, "Use WASD to move back, forth, and sideways.\nUse the mouse or arrow keys to change camera direction.\nQ and E move up and down.\nZ and X rotate around the Z axis.\nPress 1 to switch to wireframe, and 2 to switch back to shading.\nPress 3/4 to toggle animation, and 5/6 to toggle surface normals");
 
 	}
 
@@ -110,7 +110,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		layout.setHorizontalGroup(
 				layout.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, layout.createSequentialGroup()
-						.addContainerGap()
 						.addComponent(heightmapCanvas, GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE)
 						.addPreferredGap(ComponentPlacement.RELATED))
 				);
@@ -253,6 +252,18 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		break;
 		case (KeyEvent.VK_2):
 			renderer.setRenderType(RenderType.TEXTURED);
+		break;
+		case (KeyEvent.VK_3):
+			renderer.setAnimationType(AnimationType.NONE);
+		break;
+		case (KeyEvent.VK_4):
+			renderer.setAnimationType(AnimationType.ANIMATED);
+		break;
+		case (KeyEvent.VK_5):
+			renderer.setNormalType(NormalType.NONE);
+		break;
+		case (KeyEvent.VK_6):
+			renderer.setNormalType(NormalType.NORMALS);
 		break;
 		case (KeyEvent.VK_ESCAPE):
 			System.exit(0);
