@@ -136,8 +136,8 @@ public class GLRenderer implements GLEventListener
 		}
 
 
-		for (int X = 0; X < (MAP_SIZE); X += 1) {
-			for (int Y = 0; Y < (MAP_SIZE); Y += 1) {
+		for (int X = 0; X < (MAP_SIZE-1); X += 1) {
+			for (int Y = 0; Y < (MAP_SIZE-1); Y += 1) {
 				int x = X;
 				int y = pHeightMap[X][Y];
 				int z = Y;
@@ -147,7 +147,8 @@ public class GLRenderer implements GLEventListener
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-
+				gl.glNormal3f(normal[X][Y].x, normal[X][Y].y, normal[X][Y].z);
+				
 				x = X;
 				y = pHeightMap[X][Y + 1];
 				z = Y + 1;
@@ -157,7 +158,7 @@ public class GLRenderer implements GLEventListener
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-				//gl.glNormal3f(normal[n+1].x, normal[n+1].y, normal[n+1].z);
+				gl.glNormal3f(normal[X][Y+1].x, normal[X][Y+1].y, normal[X][Y+1].z);
 
 				x = X + 1;
 				y = pHeightMap[X + 1][Y + 1];
@@ -168,8 +169,7 @@ public class GLRenderer implements GLEventListener
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
-
-				//gl.glNormal3f(normal[n+2].x, normal[n+2].y, normal[n+2].z);
+				gl.glNormal3f(normal[X+1][Y+1].x, normal[X+1][Y+1].y, normal[X+1][Y+1].z);
 
 				x = X + 1;
 				y = pHeightMap[X + 1][Y];
@@ -180,6 +180,7 @@ public class GLRenderer implements GLEventListener
 					setVertexColor(gl, pHeightMap, x, z);
 				}
 				gl.glVertex3i(x, y, z);
+				gl.glNormal3f(normal[X+1][Y].x, normal[X+1][Y].y, normal[X+1][Y].z);
 			}
 		}
 
@@ -215,19 +216,19 @@ public class GLRenderer implements GLEventListener
 
 	private void calcNorms(GL gl, int[][] pHeightMap)
 	{
-		normal[0][0] = new Vector3f();
-		/*
-		for (int i = 0; i < normal.length; i++) {
-			normal[i] = new Vector3f(0,0,0);
+		for (int x = 0; x < MAP_SIZE; x++) {
+			for (int y = 0; y < MAP_SIZE; y++) {
+				normal[x][y] = new Vector3f(0,0,0);
+			}
 		}
 
 		int i = 0;
-		for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE) {
-			for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
+		for (int X = 0; X < MAP_SIZE-1; X ++) {
+			for (int Y = 0; Y < MAP_SIZE-1; Y ++, i += 4) {
 				Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
-				Vector3f b = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y], Y);
-				Vector3f c = new Vector3f(X, pHeightMap[X][Y + STEP_SIZE], Y + STEP_SIZE);
-				Vector3f d = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y + STEP_SIZE], Y + STEP_SIZE);
+				Vector3f b = new Vector3f(X + 1, pHeightMap[X + 1][Y], Y);
+				Vector3f c = new Vector3f(X, pHeightMap[X][Y + 1], Y + 1);
+				Vector3f d = new Vector3f(X + 1, pHeightMap[X + 1][Y + 1], Y + 1);
 
 
 				Vector3f n1 = new Vector3f();
@@ -244,24 +245,23 @@ public class GLRenderer implements GLEventListener
 				ca.sub(c, d);
 				n2.cross(bd, cd);
 
-				normal[i].add(new Vector3f(n1));
+				normal[X][Y].add(new Vector3f(n1));
 
-				normal[i+1].add(new Vector3f(n1));
-				normal[i+1].add(new Vector3f(n2));
+				normal[X+1][Y].add(new Vector3f(n1));
+				normal[X+1][Y].add(new Vector3f(n2));
 
-				normal[i+2].add(new Vector3f(n1));
-				normal[i+2].add(new Vector3f(n2));
+				normal[X][Y+1].add(new Vector3f(n1));
+				normal[X][Y+1].add(new Vector3f(n2));
 
-				normal[i+3].add(new Vector3f(n2));
+				normal[X+1][Y+1].add(new Vector3f(n2));
 
 			}
 		}
 
-		for (Vector3f n : normal) {
-			n.normalize();
+		for (Vector3f[] l1 : normal) {
+			for (Vector3f l2 : l1)
+			l2.normalize();
 		}
-		 */
-
 	}
 
 	private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
