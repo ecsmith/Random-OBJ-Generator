@@ -1,512 +1,393 @@
 import java.io.IOException;
-import java.io.InputStream;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
-import javax.media.opengl.glu.GLUquadric;
 import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.GLUT;
 
 public class GLRenderer implements GLEventListener
 {
-<<<<<<< HEAD
-    private RenderType renderType;  
-    private RenderType animatorType;
-    private static final int MAP_SIZE = 256;                 
-    private static final int STEP_SIZE = 1;                     
-    private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
-    private Vector3f[] normal = new Vector3f[MAP_SIZE * MAP_SIZE];
-=======
-    private Vector3f[] normal = new Vector3f[4 * MAP_SIZE * MAP_SIZE];
-    private RenderType renderType;                            
-    private static final int MAP_SIZE = 1024;                 
-    private static final int STEP_SIZE = 4;                     
-    private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];  
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-    private float scaleValue = 0.10f;                          
-    private float HEIGHT_RATIO = 1.0f;                          
-    private float skyMovCounter = 0.0f;                       
-    private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};       
-    private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};        
-    private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f};                             
-    private int[] textures = new int[1];                     
-    private int skyTexture;                                    
-    private GLU glu = new GLU();                            
-    private GLUT glut;
-    private GL _gl;                                            
-    public String filename = null;                           
-    public Camera camera = new Camera();                     
+	private RenderType renderType;
+	private static final int MAP_SIZE = 256;
+	private int[][] heightMap = new int[MAP_SIZE][MAP_SIZE];
+	private Vector3f[][] normal = new Vector3f[MAP_SIZE][MAP_SIZE];
+	private float scaleValue = 0.10f;
+	private float HEIGHT_RATIO = 1.0f;
+	private float skyMovCounter = 0.0f;
+	private float[] lightAmbient = {1.0f, 1.0f, 1.0f, 0.5f};
+	private float[] lightDiffuse = {1.0f, 1.0f, 1.0f, 0.5f};
+	private float[] lightPosition = {-50.0f, 200.0f, -50.0f, 1.0f};
+	private int[] textures = new int[1];
+	private int skyTexture;
+	private GLU glu = new GLU();
+	private GLUT glut;
+	private GL _gl;
+	public String filename = null;
+	public Camera camera = new Camera();
 
-    public GLRenderer(String file)
-    {
-        filename = file;
-        renderType = RenderType.TEXTURED;
-    }
+	public GLRenderer(String file)
+	{
+		filename = file;
+		renderType = RenderType.TEXTURED;
+	}
 
-    public GLRenderer()
-    {
-        renderType = RenderType.TEXTURED;
-    }
-
-  
-    public void init(GLAutoDrawable drawable)
-    {
-    	glut = new GLUT();
-        GL gl = drawable.getGL();
-        this._gl = gl;
-        System.err.println("INIT GL IS: " + gl.getClass().getName());
-
-        gl.setSwapInterval(1);
-
-        gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        gl.glClearDepth(1.0f);                     
-        gl.glEnable(GL.GL_DEPTH_TEST);             
-        gl.glDepthFunc(GL.GL_LEQUAL);           
-        gl.glShadeModel(GL.GL_SMOOTH);              
-        
-
-     
-       
-        gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
-
-        if(filename == null)
-            loadFile("Terrain2.raw");    
-        else
-            loadFile(filename);
-        setTexture();  
-<<<<<<< HEAD
-
-        setLightning(gl);
-       // calcNorms(gl, heightMap);
-
-        quadric = glu.gluNewQuadric();                 
-        glu.gluQuadricNormals(quadric, GLU.GLU_SMOOTH); 
-        glu.gluQuadricTexture(quadric, true);  
-=======
-        setLightning(gl);  
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-        loadSkyTexture();  
-    }
-
-    public void loadFile(String filename)
-<<<<<<< HEAD
-    {
-    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, 1, 600);
-       //try { loadRawFile(filename, heightMap); }
-       //catch (IOException e) { throw new RuntimeException(e); }
-=======
-    {
-    	heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .5, 600);
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-    }
-
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
-    {
-        GL gl = drawable.getGL();        
-
-        height = (height == 0) ? 1 : height;
-
-        gl.glViewport(0, 0, width, height);
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glLoadIdentity();
-
-        glu.gluPerspective(45, (float) width / height, 1, 10000);  
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-    }
-
-    public void display(GLAutoDrawable drawable)
-    {
-        GL gl = drawable.getGL();
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-
-        gl.glLoadIdentity();
-        Vector3 camPosition = camera.getCameraPosition();
-        Vector3 camTarget = camera.getCameraTarget();
-        Vector3 upVector = camera.getUpVector();
-        glu.gluLookAt(camPosition.X, 
-                camPosition.Y,
-                camPosition.Z,
-                camTarget.X,
-                camTarget.Y,
-                camTarget.Z,
-                upVector.X,
-                upVector.Y,
-                upVector.Z);
-
-        
-        gl.glScalef(scaleValue, scaleValue * HEIGHT_RATIO, scaleValue);    // scaling
-        setLightning(gl);  
-        gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-        gl.glEnable(GL.GL_LIGHT0); 
-        gl.glEnable(GL.GL_LIGHTING);
-        renderHeightMap(gl, heightMap);
-        gl.glDisable(GL.GL_LIGHT0); 
-        gl.glDisable(GL.GL_LIGHTING);
-
-        drawSky();  
-        animateTerrain();
-        gl.glFlush();
-    }
-
-    public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged) 
-    {
-    }
+	public GLRenderer()
+	{
+		renderType = RenderType.TEXTURED;
+	}
 
 
-<<<<<<< HEAD
-    private void calcNorms(GL gl, int[][] pHeightMap) 
-    {
+	@Override
+	public void init(GLAutoDrawable drawable)
+	{
+		glut = new GLUT();
+		GL gl = drawable.getGL();
+		this._gl = gl;
+		System.err.println("INIT GL IS: " + gl.getClass().getName());
 
-        for (int i = 0; i < normal.length; i++) {
-        	normal[i] = new Vector3f(0,0,0);
-        }
-        
-        int i = 0;
-        for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
-            for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
-            	Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
-            	Vector3f b = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y], Y);
-            	Vector3f c = new Vector3f(X, pHeightMap[X][Y + STEP_SIZE], Y + STEP_SIZE);
-            	Vector3f d = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y + STEP_SIZE], Y + STEP_SIZE);
-            	
-            	
-            	Vector3f n1 = new Vector3f();
-            	Vector3f ba = new Vector3f();
-            	ba.sub(b, a);
-            	Vector3f ca = new Vector3f();
-            	ca.sub(c, a);
-            	n1.cross(ba, ca);
-            	
-            	Vector3f n2 = new Vector3f();
-              	Vector3f bd = new Vector3f();
-            	ba.sub(b, d);
-            	Vector3f cd = new Vector3f();
-            	ca.sub(c, d);
-            	n2.cross(bd, cd);
-    
-            	normal[i].add(new Vector3f(n1));
- 
-            	normal[i+1].add(new Vector3f(n1));
-            	normal[i+1].add(new Vector3f(n2));
+		gl.setSwapInterval(1);
 
-            	normal[i+2].add(new Vector3f(n1));
-            	normal[i+2].add(new Vector3f(n2));
-
-            	normal[i+3].add(new Vector3f(n2));
-
-            }
-        
-        for (Vector3f n : normal) {
-        	n.normalize();
-        }
- 
-    }
-    
-    private void renderHeightMap(GL gl, int[][] pHeightMap) 
-=======
-    private void renderHeightMap(GL gl, byte[] pHeightMap) 
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-    {
-        if(renderType == RenderType.LINE)
-            gl.glBegin(gl.GL_LINES);
-        else
-            gl.glBegin(gl.GL_QUADS);
-
-<<<<<<< HEAD
-        int n = 0;
-        for (int X = 0; X < (MAP_SIZE); X += 1)
-            for (int Y = 0; Y < (MAP_SIZE); Y += 1, n += 4) 
-            {
-                int ax = X;
-                int ay = pHeightMap[X][Y];
-                int az = Y;
-=======
-        for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
-            for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE) 
-            {
-                int x = X;
-                int y = height(pHeightMap, X, Y);
-                int z = Y;
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-                if(renderType == RenderType.TEXTURED)
-                    gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);  
-                else
-<<<<<<< HEAD
-                    setVertexColor(gl, pHeightMap, ax, az); 
-                gl.glVertex3i(ax, ay, az);
-                
-                int bx = X;
-                int by = pHeightMap[X][Y + 1];
-                int bz = Y + 1;
-=======
-                    setVertexColor(gl, pHeightMap, x, z); 
-                gl.glVertex3i(x, y, z);                          
-
-                x = X;
-                y = height(pHeightMap, X, Y + STEP_SIZE);
-                z = Y + STEP_SIZE;
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-                if(renderType == RenderType.TEXTURED)
-                    gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
-                else
-<<<<<<< HEAD
-                    setVertexColor(gl, pHeightMap, bx, bz);
-                gl.glVertex3i(bx, by, bz);
-                //gl.glNormal3f(normal[n+1].x, normal[n+1].y, normal[n+1].z);
-                
-                int cx = X + 1;
-                int cy = pHeightMap[X + 1][Y + 1];
-                int cz = Y + 1;
-=======
-                    setVertexColor(gl, pHeightMap, x, z);
-                gl.glVertex3i(x, y, z);
-                x = X + STEP_SIZE;
-                y = height(pHeightMap, X + STEP_SIZE, Y + STEP_SIZE);
-                z = Y + STEP_SIZE;
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-                if(renderType == RenderType.TEXTURED)
-                    gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
-                else
-<<<<<<< HEAD
-                    setVertexColor(gl, pHeightMap, cx, cz);
-                gl.glVertex3i(cx, cy, cz);
-                
-                gl.glVertex3i(cx, cy, cz);
-                //gl.glNormal3f(normal[n+2].x, normal[n+2].y, normal[n+2].z);
-                
-                int dx = X + 1;
-                int dy = pHeightMap[X + 1][Y];
-                int dz = Y;
-=======
-                    setVertexColor(gl, pHeightMap, x, z);
-                gl.glVertex3i(x, y, z);
-
-                x = X + STEP_SIZE;
-                y = height(pHeightMap, X + STEP_SIZE, Y);
-                z = Y;
->>>>>>> fd113dffb2fe868372c3cba4010d39cde08f55a6
-                if(renderType == RenderType.TEXTURED)
-                    gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);
-                else
-                    setVertexColor(gl, pHeightMap, x, z);
-                gl.glVertex3i(x, y, z);
-            }
-        
-        gl.glEnd();
-        gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // reset
-    }
-    
-        private void setVertexColor(GL gl, int[][] pHeightMap, int x, int y) 
-    {
-        int height = pHeightMap[x][y];
-        if(renderType != RenderType.MULTICOLOR)
-        {            
-            float fColor = 0.1f + (height / 256.0f);
-            gl.glColor3f(0, 0, fColor);
-        }
-        else
-        {
-            if(height >= 250)
-                gl.glColor3f(0.984313f, 0.3019607f, 0.3019607f);
-            else if(height > 200)
-                gl.glColor3f(1.0f, 0.5607843f, 0.243147f);
-            else if(height > 150)
-                gl.glColor3f(0.50196f, 1.0f, 0.50196f);
-            else if(height > 100)
-                gl.glColor3f(0.011764f, 0.55294117f, 0.1490196f);
-            else if(height > 50)
-                gl.glColor3f(0.011764f, 0.6862745f, 0.945098f);
-            else
-                gl.glColor3f(0.011764f, 0.270588f, 0.945098f);
-        }
-    }
-
-    private static void readBuffer(InputStream in, byte[] buffer) throws IOException
-    {
-        int bytesRead = 0;
-        int bytesToRead = buffer.length;
-        while (bytesToRead > 0) {
-            int read = in.read(buffer, bytesRead, bytesToRead);
-            bytesRead += read;
-            bytesToRead -= read;
-        }
-    }
-    private void calcNorms(GL gl, byte[] pHeightMap) 
-    {
-
-        for (int i = 0; i < normal.length; i++) {
-        	normal[i] = new Vector3f(0,0,0);
-        }
-        
-        int i = 0;
-        for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE)
-            for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
-            	Vector3f a = new Vector3f(X, height(pHeightMap, X, Y), Y);
-            	Vector3f b = new Vector3f(X + STEP_SIZE, height(pHeightMap, X + STEP_SIZE, Y), Y);
-            	Vector3f c = new Vector3f(X, height(pHeightMap, X, Y + STEP_SIZE), Y + STEP_SIZE);
-            	Vector3f d = new Vector3f(X + STEP_SIZE, height(pHeightMap, X + STEP_SIZE, Y + STEP_SIZE), Y + STEP_SIZE);
-            	
-            	
-            	Vector3f n1 = new Vector3f();
-            	Vector3f ba = new Vector3f();
-            	ba.sub(b, a);
-            	Vector3f ca = new Vector3f();
-            	ca.sub(c, a);
-            	n1.cross(ba, ca);
-            	
-            	Vector3f n2 = new Vector3f();
-              	Vector3f bd = new Vector3f();
-            	ba.sub(b, d);
-            	Vector3f cd = new Vector3f();
-            	ca.sub(c, d);
-            	n2.cross(bd, cd);
-    
-            	normal[i].add(new Vector3f(n1));
- 
-            	normal[i+1].add(new Vector3f(n1));
-            	normal[i+1].add(new Vector3f(n2));
-
-            	normal[i+2].add(new Vector3f(n1));
-            	normal[i+2].add(new Vector3f(n2));
-
-            	normal[i+3].add(new Vector3f(n2));
-
-            }
-        
-        for (Vector3f n : normal) {
-        	n.normalize();
-        }
- 
-    }
-    
-    
-    private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
-    {
-
-            gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
-                    img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
-
-    }
-
-    private void setLightning(GL gl)
-    {
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, this.lightDiffuse, 0);
-        gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
-        gl.glEnable(GL.GL_LIGHT0);
-        gl.glEnable(GL.GL_LIGHTING);
-    }
-
-    private void loadSkyTexture()
-    {
-        String textureName = "sky.png";
-
-        TextureReader.Texture texture;
-        try { texture = TextureReader.readTexture(textureName); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
-
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, GL.GL_RGB8, texture.getWidth(),
-                    texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
-    }
+		gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		gl.glClearDepth(1.0f);
+		gl.glEnable(GL.GL_DEPTH_TEST);
+		gl.glDepthFunc(GL.GL_LEQUAL);
+		gl.glShadeModel(GL.GL_SMOOTH);
 
 
-    private void drawSky()
-    {
-        Vector3 camPosition = camera.getCameraPosition();
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
 
-        _gl.glPushMatrix(); 
-        _gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
-        _gl.glRotatef(skyMovCounter, 0.0f, 0.0f, 1.0f); 
-        _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
-        double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
-        _gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0); 
-        _gl.glEnable(GL.GL_CLIP_PLANE1);
-        glut.glutSolidSphere(5000, 50, 5);
-        _gl.glDisable(GL.GL_CLIP_PLANE1);
-        _gl.glPopMatrix();  
-        _gl.glPushMatrix(); 
-        _gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
-        _gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
-        double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
-        _gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0); 
-        _gl.glEnable(GL.GL_CLIP_PLANE2);    
-        glut.glutSolidSphere(5000, 50, 5);
-        _gl.glDisable(GL.GL_CLIP_PLANE2);
-        _gl.glPopMatrix();  
 
-        skyMovCounter += 0.05f; 
-    }
-    
-    private void animateTerrain()
-    {
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-        _gl.glPushMatrix(); 
-        TextureReader.Texture texture;
-        try {
+		gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+
+		heightMap = TerrainGen.getRandomTerrain(MAP_SIZE, .9, 600);
+		
+		setTexture();
+		calcNorms(gl, heightMap);
+		setLightning(gl);
+
+		loadSkyTexture();
+	}
+
+	@Override
+	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
+	{
+		GL gl = drawable.getGL();
+
+		height = (height == 0) ? 1 : height;
+
+		gl.glViewport(0, 0, width, height);
+		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glLoadIdentity();
+
+		glu.gluPerspective(45, (float) width / height, 1, 10000);
+		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glLoadIdentity();
+
+	}
+
+	@Override
+	public void display(GLAutoDrawable drawable)
+	{
+		GL gl = drawable.getGL();
+		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+
+		gl.glLoadIdentity();
+		Vector3 camPosition = camera.getCameraPosition();
+		Vector3 camTarget = camera.getCameraTarget();
+		Vector3 upVector = camera.getUpVector();
+		glu.gluLookAt(camPosition.X,
+				camPosition.Y,
+				camPosition.Z,
+				camTarget.X,
+				camTarget.Y,
+				camTarget.Z,
+				upVector.X,
+				upVector.Y,
+				upVector.Z);
+
+
+		gl.glScalef(scaleValue, scaleValue * HEIGHT_RATIO, scaleValue);    // scaling
+		setLightning(gl);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		gl.glEnable(GL.GL_LIGHT0);
+		gl.glEnable(GL.GL_LIGHTING);
+		renderHeightMap(gl, heightMap);
+		gl.glDisable(GL.GL_LIGHT0);
+		gl.glDisable(GL.GL_LIGHTING);
+
+		drawSky();
+		animateTerrain();
+		gl.glFlush();
+	}
+
+	@Override
+	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged, boolean deviceChanged)
+	{
+	}
+
+
+
+	private void renderHeightMap(GL gl, int[][] pHeightMap) {
+		if(renderType == RenderType.LINE) {
+			gl.glBegin(GL.GL_LINES);
+		} else {
+			gl.glBegin(GL.GL_QUADS);
+		}
+
+
+		for (int X = 0; X < (MAP_SIZE); X += 1) {
+			for (int Y = 0; Y < (MAP_SIZE); Y += 1) {
+				int x = X;
+				int y = pHeightMap[X][Y];
+				int z = Y;
+				if(renderType == RenderType.TEXTURED) {
+					gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);
+				} else {
+					setVertexColor(gl, pHeightMap, x, z);
+				}
+				gl.glVertex3i(x, y, z);
+
+				x = X;
+				y = pHeightMap[X][Y + 1];
+				z = Y + 1;
+				if(renderType == RenderType.TEXTURED) {
+					gl.glTexCoord2f((float)x / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
+				} else {
+					setVertexColor(gl, pHeightMap, x, z);
+				}
+				gl.glVertex3i(x, y, z);
+				//gl.glNormal3f(normal[n+1].x, normal[n+1].y, normal[n+1].z);
+
+				x = X + 1;
+				y = pHeightMap[X + 1][Y + 1];
+				z = Y + 1;
+				if(renderType == RenderType.TEXTURED) {
+					gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)(z + 1) / (float)MAP_SIZE);
+				} else {
+					setVertexColor(gl, pHeightMap, x, z);
+				}
+				gl.glVertex3i(x, y, z);
+
+				//gl.glNormal3f(normal[n+2].x, normal[n+2].y, normal[n+2].z);
+
+				x = X + 1;
+				y = pHeightMap[X + 1][Y];
+				z = Y;
+				if(renderType == RenderType.TEXTURED) {
+					gl.glTexCoord2f((float)(x + 1) / (float)MAP_SIZE, (float)z / (float)MAP_SIZE);
+				} else {
+					setVertexColor(gl, pHeightMap, x, z);
+				}
+				gl.glVertex3i(x, y, z);
+			}
+		}
+
+		gl.glEnd();
+		gl.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // reset
+	}
+
+	private void setVertexColor(GL gl, int[][] pHeightMap, int x, int y)
+	{
+		int height = pHeightMap[x][y];
+		if(renderType != RenderType.MULTICOLOR)
+		{
+			float fColor = 0.1f + (height / 256.0f);
+			gl.glColor3f(0, 0, fColor);
+		}
+		else
+		{
+			if(height >= 250) {
+				gl.glColor3f(0.984313f, 0.3019607f, 0.3019607f);
+			} else if(height > 200) {
+				gl.glColor3f(1.0f, 0.5607843f, 0.243147f);
+			} else if(height > 150) {
+				gl.glColor3f(0.50196f, 1.0f, 0.50196f);
+			} else if(height > 100) {
+				gl.glColor3f(0.011764f, 0.55294117f, 0.1490196f);
+			} else if(height > 50) {
+				gl.glColor3f(0.011764f, 0.6862745f, 0.945098f);
+			} else {
+				gl.glColor3f(0.011764f, 0.270588f, 0.945098f);
+			}
+		}
+	}
+
+	private void calcNorms(GL gl, int[][] pHeightMap)
+	{
+		normal[0][0] = new Vector3f();
+		/*
+		for (int i = 0; i < normal.length; i++) {
+			normal[i] = new Vector3f(0,0,0);
+		}
+
+		int i = 0;
+		for (int X = 0; X < (MAP_SIZE - STEP_SIZE); X += STEP_SIZE) {
+			for (int Y = 0; Y < (MAP_SIZE - STEP_SIZE); Y += STEP_SIZE, i += 4) {
+				Vector3f a = new Vector3f(X, pHeightMap[X][Y], Y);
+				Vector3f b = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y], Y);
+				Vector3f c = new Vector3f(X, pHeightMap[X][Y + STEP_SIZE], Y + STEP_SIZE);
+				Vector3f d = new Vector3f(X + STEP_SIZE, pHeightMap[X + STEP_SIZE][Y + STEP_SIZE], Y + STEP_SIZE);
+
+
+				Vector3f n1 = new Vector3f();
+				Vector3f ba = new Vector3f();
+				ba.sub(b, a);
+				Vector3f ca = new Vector3f();
+				ca.sub(c, a);
+				n1.cross(ba, ca);
+
+				Vector3f n2 = new Vector3f();
+				Vector3f bd = new Vector3f();
+				ba.sub(b, d);
+				Vector3f cd = new Vector3f();
+				ca.sub(c, d);
+				n2.cross(bd, cd);
+
+				normal[i].add(new Vector3f(n1));
+
+				normal[i+1].add(new Vector3f(n1));
+				normal[i+1].add(new Vector3f(n2));
+
+				normal[i+2].add(new Vector3f(n1));
+				normal[i+2].add(new Vector3f(n2));
+
+				normal[i+3].add(new Vector3f(n2));
+
+			}
+		}
+
+		for (Vector3f n : normal) {
+			n.normalize();
+		}
+		 */
+
+	}
+
+	private void makeRGBTexture(GL gl, GLU glu,TextureReader.Texture img, int target)
+	{
+
+		gl.glTexImage2D(target, 0, GL.GL_RGB, img.getWidth(),
+				img.getHeight(), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, img.getPixels());
+
+	}
+
+	private void setLightning(GL gl)
+	{
+		gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, this.lightAmbient, 0);
+		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, this.lightDiffuse, 0);
+		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, this.lightPosition, 0);
+		gl.glEnable(GL.GL_LIGHT0);
+		gl.glEnable(GL.GL_LIGHTING);
+	}
+
+	private void loadSkyTexture()
+	{
+		String textureName = "sky.png";
+
+		TextureReader.Texture texture;
+		try { texture = TextureReader.readTexture(textureName); }
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e); }
+
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+		glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, GL.GL_RGB8, texture.getWidth(),
+				texture.getHeight(), GL.GL_RGB, GL.GL_UNSIGNED_BYTE, texture.getPixels());
+	}
+
+
+	private void drawSky()
+	{
+		Vector3 camPosition = camera.getCameraPosition();
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, skyTexture);
+
+		_gl.glPushMatrix();
+		_gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
+		_gl.glRotatef(skyMovCounter, 0.0f, 0.0f, 1.0f);
+		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+		double[] clipPlane1 = {0.0f, 0.0f, 1.0f, 0.5f};
+		_gl.glClipPlane(GL.GL_CLIP_PLANE1, clipPlane1, 0);
+		_gl.glEnable(GL.GL_CLIP_PLANE1);
+		glut.glutSolidSphere(5000, 50, 5);
+		_gl.glDisable(GL.GL_CLIP_PLANE1);
+		_gl.glPopMatrix();
+		_gl.glPushMatrix();
+		_gl.glRotatef(-91.7f, 1.0f, 0.0f, 0.0f);
+		_gl.glTranslatef(camPosition.X, camPosition.Y, camPosition.Z - MAP_SIZE * scaleValue * 0.5f);
+		double[] clipPlane2 = {0.0f, 0.0f, -1.0f, 0.5f};
+		_gl.glClipPlane(GL.GL_CLIP_PLANE2, clipPlane2, 0);
+		_gl.glEnable(GL.GL_CLIP_PLANE2);
+		glut.glutSolidSphere(5000, 50, 5);
+		_gl.glDisable(GL.GL_CLIP_PLANE2);
+		_gl.glPopMatrix();
+
+		skyMovCounter += 0.05f;
+	}
+
+	private void animateTerrain()
+	{
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glPushMatrix();
+		TextureReader.Texture texture;
+		try {
 			texture = TextureReader.animateTexture((HeightmapTerrain.file.getAbsolutePath()));
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
-        _gl.glPopMatrix();  
-    }
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
+		_gl.glPopMatrix();
+	}
 
-    private void setTexture()
-    {
-        textures = new int[1];
+	private void setTexture()
+	{
+		textures = new int[1];
 
-        _gl.glEnable(GL.GL_TEXTURE_2D);
+		_gl.glEnable(GL.GL_TEXTURE_2D);
 
-        TextureReader.Texture texture;
+		TextureReader.Texture texture;
 
-        try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
-        catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e); }
+		try { texture = TextureReader.readTexture(HeightmapTerrain.file.getAbsolutePath()); }
+		catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e); }
 
-        _gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
-        _gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-        makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
+		_gl.glBindTexture(GL.GL_TEXTURE_2D, textures[0]);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		_gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		makeRGBTexture(_gl, glu, texture, GL.GL_TEXTURE_2D);
 
-    }
+	}
 
-    public RenderType getRenderType()
-    {
-        return renderType;
-    }
+	public RenderType getRenderType()
+	{
+		return renderType;
+	}
 
-    public void setRenderType(RenderType renderType)
-    {
-        this.renderType = renderType;
-    }
+	public void setRenderType(RenderType renderType)
+	{
+		this.renderType = renderType;
+	}
 
-    public float getScaleValue()
-    {
-        return scaleValue;
-    }
+	public float getScaleValue()
+	{
+		return scaleValue;
+	}
 
-    public void setScaleValue(float scaleValue) 
-    {
-        if(scaleValue < 0.1f || scaleValue > 0.4f)
-            return;
+	public void setScaleValue(float scaleValue)
+	{
+		if(scaleValue < 0.1f || scaleValue > 0.4f) {
+			return;
+		}
 
-        this.scaleValue = scaleValue;
-    }
+		this.scaleValue = scaleValue;
+	}
 
 
 }
