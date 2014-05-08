@@ -19,10 +19,7 @@ public class TextureReader
 	public static Texture readTexture(String filename, boolean storeAlphaChannel) throws IOException
 	{
 		BufferedImage bufferedImage;
-		if (filename.endsWith(".bmp"))  
-			bufferedImage = BitmapLoader.loadBitmap(filename);
-		else    
-			bufferedImage = readImage(filename);
+		bufferedImage = readImage(filename);
 
 		return readPixels(bufferedImage, storeAlphaChannel, false);
 	}
