@@ -87,7 +87,8 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 											"Z and X rotate around the Z axis.\n" +
 											"Press 1 to toggle wireframe/textured.\n" +
 											"Press 2 to toggle animation, and 3 to toggle surface normals.\n" +
-											"Press 4 to generate a new random terrain.");
+											"Press 4 to generate a new random terrain.\n" + 
+											"Press 5 to load a new texture.");
 
 	}
 
@@ -151,19 +152,6 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 
 						System.out.println("Opening: " + file.getName() + ".\n");
 						System.out.println("Size in Bytes: " + file.getFreeSpace() + ".\n");
-						try{
-							RandomAccessFile rand_file = new RandomAccessFile(file.getAbsoluteFile(), "rw");
-							System.out.println("Size in Bytes: " + rand_file.length() + ".\n");
-							rand_file.seek(0);
-							input_bytes = new byte[(int)rand_file.length()];
-							rand_file.readFully(input_bytes);
-							System.out.println("Output: " + input_bytes.toString() + ".\n");
-							rand_file.close();
-
-						} catch (IOException e) {//If the file is not found
-							e.printStackTrace();  //Print trace the error
-							System.exit(0);
-						}
 
 					} else {
 						System.out.println("Open command cancelled by user.\n");
@@ -283,6 +271,26 @@ public class HeightmapTerrain extends JFrame implements KeyListener, MouseMotion
 		break;
 		case (KeyEvent.VK_4):
 			renderer.newHeightmap();
+		break;
+		case (KeyEvent.VK_5):
+			File tfile = new File(System.getProperty("user.dir"));
+			JFileChooser fc = new JFileChooser("");
+			fc.setCurrentDirectory(file);
+			fc.setAcceptAllFileFilterUsed(false);
+			fc.addChoosableFileFilter(new imgFilter());
+			int returnVal = fc.showOpenDialog(null);
+
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				tfile = fc.getSelectedFile();
+
+				System.out.println("Opening: " + file.getName() + ".\n");
+				System.out.println("Size in Bytes: " + file.getFreeSpace() + ".\n");
+				
+				file = tfile;
+			} else {
+				System.out.println("Open command cancelled by user.\n");
+			}
+			
 		break;
 		case (KeyEvent.VK_ESCAPE):
 			System.exit(0);
