@@ -10,7 +10,8 @@ import com.sun.opengl.util.GLUT;
 
 public class GLRenderer implements GLEventListener
 {
-    private RenderType renderType;                            
+    private RenderType renderType;  
+    private RenderType animatorType;
     private static final int MAP_SIZE = 1024;                 
     private static final int STEP_SIZE = 4;                     
     private byte[] heightMap = new byte[MAP_SIZE * MAP_SIZE];  
@@ -133,7 +134,7 @@ public class GLRenderer implements GLEventListener
         gl.glDisable(GL.GL_LIGHT0); 
         gl.glDisable(GL.GL_LIGHTING);
 
-        drawSky();  
+//        drawSky();  
         animateTerrain();
         gl.glFlush();
     }
